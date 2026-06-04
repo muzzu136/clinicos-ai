@@ -4,7 +4,8 @@ import {
   LayoutDashboard, Calendar, Users, DollarSign, TrendingUp,
   Star, MessageSquare, Phone, BarChart3, Bot,
   FileText, UserPlus, Building2, ChevronLeft, ChevronRight,
-  Activity, BrainCircuit
+  Activity, BrainCircuit, Mic, GitBranch, Eye, MapPin,
+  LineChart, Briefcase, Settings, Award
 } from "lucide-react";
 import { useState } from "react";
 
@@ -14,14 +15,17 @@ const navGroups = [
     items: [
       { label: "Dashboard", icon: LayoutDashboard, path: "/" },
       { label: "AI Copilot", icon: BrainCircuit, path: "/copilot" },
+      { label: "AI Consultant", icon: Briefcase, path: "/business-consultant" },
     ]
   },
   {
     label: "Operations",
     items: [
+      { label: "Voice Receptionist", icon: Mic, path: "/voice-receptionist" },
       { label: "Appointments", icon: Calendar, path: "/appointments" },
       { label: "Patients", icon: Users, path: "/patients" },
       { label: "Providers", icon: Activity, path: "/providers" },
+      { label: "Staff Productivity", icon: Award, path: "/staff-productivity" },
     ]
   },
   {
@@ -30,6 +34,7 @@ const navGroups = [
       { label: "Revenue Cycle", icon: DollarSign, path: "/revenue-cycle" },
       { label: "Claims", icon: FileText, path: "/claims" },
       { label: "Financial Intel", icon: BarChart3, path: "/financials" },
+      { label: "Predictive Analytics", icon: LineChart, path: "/predictive-analytics" },
     ]
   },
   {
@@ -38,6 +43,8 @@ const navGroups = [
       { label: "Campaigns", icon: TrendingUp, path: "/campaigns" },
       { label: "Reputation", icon: Star, path: "/reputation" },
       { label: "Leads", icon: UserPlus, path: "/leads" },
+      { label: "Referrals", icon: GitBranch, path: "/referrals" },
+      { label: "Competitor Intel", icon: Eye, path: "/competitor-intelligence" },
     ]
   },
   {
@@ -45,6 +52,13 @@ const navGroups = [
     items: [
       { label: "Messages", icon: MessageSquare, path: "/messages" },
       { label: "Call Intel", icon: Phone, path: "/call-intelligence" },
+    ]
+  },
+  {
+    label: "Enterprise",
+    items: [
+      { label: "Multi-Location", icon: MapPin, path: "/multi-location" },
+      { label: "Settings", icon: Settings, path: "/settings" },
     ]
   }
 ];

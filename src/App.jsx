@@ -26,6 +26,14 @@ import Providers from '@/pages/Providers';
 import Messages from '@/pages/Messages';
 import CallIntelligence from '@/pages/CallIntelligence';
 import AICopilot from '@/pages/AICopilot';
+import StaffProductivity from '@/pages/StaffProductivity';
+import Referrals from '@/pages/Referrals';
+import CompetitorIntelligence from '@/pages/CompetitorIntelligence';
+import MultiLocation from '@/pages/MultiLocation';
+import PredictiveAnalytics from '@/pages/PredictiveAnalytics';
+import BusinessConsultant from '@/pages/BusinessConsultant';
+import Settings from '@/pages/Settings';
+import VoiceReceptionist from '@/pages/VoiceReceptionist';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -72,6 +80,14 @@ const AuthenticatedApp = () => {
           <Route path="/messages" element={<Messages />} />
           <Route path="/call-intelligence" element={<CallIntelligence />} />
           <Route path="/copilot" element={<AICopilot />} />
+          <Route path="/staff-productivity" element={<StaffProductivity />} />
+          <Route path="/referrals" element={<Referrals />} />
+          <Route path="/competitor-intelligence" element={<CompetitorIntelligence />} />
+          <Route path="/multi-location" element={<MultiLocation />} />
+          <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
+          <Route path="/business-consultant" element={<BusinessConsultant />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/voice-receptionist" element={<VoiceReceptionist />} />
         </Route>
       </Route>
 

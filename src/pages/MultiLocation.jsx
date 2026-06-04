@@ -1,0 +1,222 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Building2, TrendingUp, Users, DollarSign,
+  Calendar, Star, MapPin, Plus, Award
+} from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, LineChart, Line, Legend
+} from "recharts";
+
+const locations = [
+  {
+    id: 1, name: "Downtown Clinic", address: "123 Main St, Chicago IL",
+    status: "active", providers: 4, patients: 2847, revenueMTD: 242800,
+    utilization: 87, rating: 4.8, noShowRate: 4.2, collectionRate: 94
+  },
+  {
+    id: 2, name: "North Side Office", address: "456 Oak Ave, Chicago IL",
+    status: "active", providers: 3, patients: 1924, revenueMTD: 178400,
+    utilization: 82, rating: 4.6, noShowRate: 5.1, collectionRate: 91
+  },
+  {
+    id: 3, name: "Westside Medical", address: "789 Park Blvd, Chicago IL",
+    status: "active", providers: 2, patients: 1102, revenueMTD: 98600,
+    utilization: 74, rating: 4.5, noShowRate: 6.3, collectionRate: 89
+  },
+  {
+    id: 4, name: "South Loop Clinic", address: "321 Lake Dr, Chicago IL",
+    status: "opening_soon", providers: 2, patients: 0, revenueMTD: 0,
+    utilization: 0, rating: 0, noShowRate: 0, collectionRate: 0
+  },
+];
+
+const revenueComparison = [
+  { month: "Sep", Downtown: 218000, NorthSide: 162000, Westside: 87000 },
+  { month: "Oct", Downtown: 228000, NorthSide: 168000, Westside: 91000 },
+  { month: "Nov", Downtown: 234000, NorthSide: 172000, Westside: 95000 },
+  { month: "Dec", Downtown: 242800, NorthSide: 178400, Westside: 98600 },
+];
+
+const benchmarks = [
+  { metric: "Revenue MTD", Downtown: 242800, NorthSide: 178400, Westside: 98600, unit: "$" },
+  { metric: "Utilization %", Downtown: 87, NorthSide: 82, Westside: 74, unit: "%" },
+  { metric: "Collection Rate", Downtown: 94, NorthSide: 91, Westside: 89, unit: "%" },
+  { metric: "Patient Rating", Downtown: 4.8, NorthSide: 4.6, Westside: 4.5, unit: "★" },
+  { metric: "No-Show Rate", Downtown: 4.2, NorthSide: 5.1, Westside: 6.3, unit: "%" },
+];
+
+export default function MultiLocation() {
+  const [tab, setTab] = useState("overview");
+  const [selected, setSelected] = useState(null);
+
+  const activeLocations = locations.filter(l => l.status === "active");
+  const totalRevenue = activeLocations.reduce((s, l) => s + l.revenueMTD, 0);
+  const totalPatients = activeLocations.reduce((s, l) => s + l.patients, 0);
+
+  return (
+    <div className="space-y-6 max-w-[1600px] mx-auto">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-heading font-bold">Multi-Location Management</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Enterprise-wide analytics & benchmarking across all locations</p>
+        </div>
+        <Button className="gap-2"><Plus className="w-4 h-4" />Add Location</Button>
+      </div>
+
+      {/* Network KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Network Revenue (MTD)", value: `$${(totalRevenue/1000).toFixed(0)}K`, icon: DollarSign, color: "bg-emerald-50 text-emerald-600" },
+          { label: "Total Active Patients", value: totalPatients.toLocaleString(), icon: Users, color: "bg-primary/10 text-primary" },
+          { label: "Active Locations", value: activeLocations.length, icon: Building2, color: "bg-violet-50 text-violet-600" },
+          { label: "Avg Utilization", value: `${Math.round(activeLocations.reduce((s, l) => s + l.utilization, 0) / activeLocations.length)}%`, icon: TrendingUp, color: "bg-amber-50 text-amber-600" },
+        ].map((stat, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+            className="bg-card rounded-xl border border-border p-4">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${stat.color}`}>
+              <stat.icon className="w-4 h-4" />
+            </div>
+            <p className="text-xl font-heading font-bold">{stat.value}</p>
+            <p className="text-xs text-muted-foreground">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Locations</TabsTrigger>
+          <TabsTrigger value="benchmark">Benchmarking</TabsTrigger>
+          <TabsTrigger value="trends">Revenue Trends</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {tab === "overview" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {locations.map((loc, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+              className={`bg-card rounded-2xl border p-5 cursor-pointer transition-all ${selected === loc.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary/30"}`}
+              onClick={() => setSelected(selected === loc.id ? null : loc.id)}>
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-heading font-semibold">{loc.name}</h3>
+                    <Badge className={loc.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                      {loc.status === "opening_soon" ? "Opening Soon" : "Active"}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">{loc.address}</span>
+                  </div>
+                </div>
+                {loc.rating > 0 && (
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                    <span className="font-bold text-sm">{loc.rating}</span>
+                  </div>
+                )}
+              </div>
+
+              {loc.status === "active" ? (
+                <>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="text-center p-2 bg-muted/40 rounded-lg">
+                      <p className="text-sm font-bold">${(loc.revenueMTD/1000).toFixed(0)}K</p>
+                      <p className="text-xs text-muted-foreground">Revenue MTD</p>
+                    </div>
+                    <div className="text-center p-2 bg-muted/40 rounded-lg">
+                      <p className="text-sm font-bold">{loc.patients.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">Patients</p>
+                    </div>
+                    <div className="text-center p-2 bg-muted/40 rounded-lg">
+                      <p className="text-sm font-bold">{loc.providers}</p>
+                      <p className="text-xs text-muted-foreground">Providers</p>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Schedule Utilization</span>
+                      <span className="font-medium">{loc.utilization}%</span>
+                    </div>
+                    <Progress value={loc.utilization} className="h-1.5" />
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg">
+                  <Building2 className="w-4 h-4 text-amber-600" />
+                  <p className="text-sm text-amber-700">Clinic setup in progress</p>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {tab === "benchmark" && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-card rounded-2xl border border-border overflow-hidden">
+          <div className="p-5 border-b border-border flex items-center gap-2">
+            <Award className="w-5 h-5 text-primary" />
+            <h3 className="font-heading font-semibold">Location Performance Benchmarks</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50">
+                  <th className="text-left p-4 font-medium text-muted-foreground">Metric</th>
+                  <th className="text-left p-4 font-medium text-muted-foreground">Downtown</th>
+                  <th className="text-left p-4 font-medium text-muted-foreground">North Side</th>
+                  <th className="text-left p-4 font-medium text-muted-foreground">Westside</th>
+                  <th className="text-left p-4 font-medium text-muted-foreground">Best</th>
+                </tr>
+              </thead>
+              <tbody>
+                {benchmarks.map((b, i) => {
+                  const vals = [b.Downtown, b.NorthSide, b.Westside];
+                  const isLowerBetter = b.metric === "No-Show Rate";
+                  const best = isLowerBetter ? Math.min(...vals) : Math.max(...vals);
+                  const fmt = (v) => b.unit === "$" ? `$${v.toLocaleString()}` : `${v}${b.unit}`;
+                  return (
+                    <tr key={i} className="border-t border-border">
+                      <td className="p-4 font-medium">{b.metric}</td>
+                      {[b.Downtown, b.NorthSide, b.Westside].map((v, j) => (
+                        <td key={j} className={`p-4 ${v === best ? "font-bold text-emerald-600" : ""}`}>
+                          {fmt(v)}
+                          {v === best && <span className="ml-1 text-xs">🏆</span>}
+                        </td>
+                      ))}
+                      <td className="p-4 text-emerald-600 font-bold">{fmt(best)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+      )}
+
+      {tab === "trends" && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-2xl border border-border p-6">
+          <h3 className="font-heading font-semibold mb-4">Revenue by Location — Last 4 Months</h3>
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={revenueComparison}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214,32%,91%)" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(215,16%,47%)" }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(215,16%,47%)" }} tickFormatter={v => `$${(v/1000).toFixed(0)}K`} />
+              <Tooltip contentStyle={{ borderRadius: 10, border: "1px solid hsl(214,32%,91%)", fontSize: 12 }} formatter={v => `$${v.toLocaleString()}`} />
+              <Legend />
+              <Line type="monotone" dataKey="Downtown" stroke="hsl(217,91%,60%)" strokeWidth={2.5} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="NorthSide" stroke="hsl(172,66%,50%)" strokeWidth={2.5} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="Westside" stroke="hsl(262,83%,58%)" strokeWidth={2.5} dot={{ r: 4 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+      )}
+    </div>
+  );
+}
