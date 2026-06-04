@@ -1,0 +1,89 @@
+{
+  "name": "Claim",
+  "type": "object",
+  "properties": {
+    "claim_number": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "provider_name": {
+      "type": "string"
+    },
+    "payer_name": {
+      "type": "string"
+    },
+    "service_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "amount_billed": {
+      "type": "number"
+    },
+    "amount_allowed": {
+      "type": "number"
+    },
+    "amount_paid": {
+      "type": "number",
+      "default": 0
+    },
+    "patient_responsibility": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "pending",
+        "accepted",
+        "rejected",
+        "denied",
+        "paid",
+        "partially_paid",
+        "appealed"
+      ],
+      "default": "submitted"
+    },
+    "denial_reason": {
+      "type": "string"
+    },
+    "cpt_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "icd_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "days_outstanding": {
+      "type": "number",
+      "default": 0
+    },
+    "ar_bucket": {
+      "type": "string",
+      "enum": [
+        "0-30",
+        "31-60",
+        "61-90",
+        "90+"
+      ],
+      "default": "0-30"
+    }
+  },
+  "required": [
+    "claim_number",
+    "patient_name",
+    "payer_name",
+    "amount_billed"
+  ]
+}

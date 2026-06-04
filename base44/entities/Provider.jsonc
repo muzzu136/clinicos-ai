@@ -1,0 +1,55 @@
+{
+  "name": "Provider",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "specialty": {
+      "type": "string"
+    },
+    "npi": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active"
+    },
+    "daily_capacity": {
+      "type": "number",
+      "default": 20
+    },
+    "utilization_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "revenue_mtd": {
+      "type": "number",
+      "default": 0
+    },
+    "patients_seen_mtd": {
+      "type": "number",
+      "default": 0
+    },
+    "avg_satisfaction": {
+      "type": "number",
+      "default": 0
+    },
+    "no_show_rate": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "specialty"
+  ]
+}

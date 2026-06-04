@@ -1,0 +1,57 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "website",
+        "google_ads",
+        "facebook",
+        "referral",
+        "walk_in",
+        "phone",
+        "other"
+      ],
+      "default": "website"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "qualified",
+        "appointment_set",
+        "converted",
+        "lost"
+      ],
+      "default": "new"
+    },
+    "score": {
+      "type": "number",
+      "default": 0
+    },
+    "service_interest": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "assigned_to": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

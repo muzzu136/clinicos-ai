@@ -1,0 +1,85 @@
+{
+  "name": "Patient",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string",
+      "description": "Patient first name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Patient last name"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date"
+    },
+    "insurance_provider": {
+      "type": "string"
+    },
+    "insurance_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "churning",
+        "lost"
+      ],
+      "default": "active"
+    },
+    "last_visit_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "next_appointment": {
+      "type": "string",
+      "format": "date"
+    },
+    "total_revenue": {
+      "type": "number",
+      "default": 0
+    },
+    "churn_risk_score": {
+      "type": "number",
+      "default": 0
+    },
+    "referral_source": {
+      "type": "string",
+      "enum": [
+        "physician",
+        "patient",
+        "marketing",
+        "walk_in",
+        "online",
+        "other"
+      ],
+      "default": "other"
+    },
+    "provider_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name"
+  ]
+}

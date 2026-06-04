@@ -1,0 +1,49 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "platform": {
+      "type": "string",
+      "enum": [
+        "google",
+        "facebook",
+        "yelp",
+        "healthgrades"
+      ],
+      "default": "google"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "content": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "response": {
+      "type": "string"
+    },
+    "responded": {
+      "type": "boolean",
+      "default": false
+    },
+    "sentiment": {
+      "type": "string",
+      "enum": [
+        "positive",
+        "neutral",
+        "negative"
+      ],
+      "default": "neutral"
+    }
+  },
+  "required": [
+    "platform",
+    "rating"
+  ]
+}
