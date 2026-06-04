@@ -203,10 +203,11 @@ export default function Settings() {
 
       {tab === "billing" && (
         <div className="space-y-6">
+          {/* Current Plan */}
           <div className="bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-2xl p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
-                <Badge className="bg-primary text-primary-foreground mb-2">Professional Plan</Badge>
+                <Badge className="bg-primary text-primary-foreground mb-2">Professional Plan — Active</Badge>
                 <h3 className="text-2xl font-heading font-bold">$1,499 / month</h3>
                 <p className="text-sm text-muted-foreground mt-1">Billed monthly · Next renewal: July 4, 2026</p>
               </div>
@@ -214,23 +215,97 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { name: "AI Voice Receptionist", price: "$299/mo", active: false },
-              { name: "Revenue Recovery Suite", price: "$199/mo", active: true },
-              { name: "White Label", price: "$499/mo", active: false },
-              { name: "Additional Location", price: "$299/mo each", active: true },
-            ].map((addon, i) => (
-              <div key={i} className="bg-card rounded-xl border border-border p-4 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-sm">{addon.name}</p>
-                  <p className="text-xs text-muted-foreground">{addon.price}</p>
-                </div>
-                <Button variant={addon.active ? "outline" : "default"} size="sm">
-                  {addon.active ? "Active" : "Add On"}
-                </Button>
-              </div>
-            ))}
+          {/* Subscription Tiers */}
+          <div>
+            <h3 className="font-heading font-semibold mb-3">Subscription Plans</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { name: "Starter", price: "$299", period: "/mo", features: ["Up to 1 provider", "Core scheduling", "Basic RCM", "Email support"], current: false, highlight: false },
+                { name: "Growth", price: "$699", period: "/mo", features: ["Up to 3 providers", "AI campaigns", "Reputation mgmt", "Call intelligence"], current: false, highlight: false },
+                { name: "Professional", price: "$1,499", period: "/mo", features: ["Up to 6 providers", "Full RCM suite", "Predictive analytics", "AI Copilot"], current: true, highlight: true },
+                { name: "Enterprise", price: "$2,999+", period: "/mo", features: ["Unlimited providers", "Multi-location", "White label", "Dedicated CSM"], current: false, highlight: false },
+              ].map((plan, i) => (
+                <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+                  className={`rounded-xl border p-5 ${plan.highlight ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border bg-card"}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="font-heading font-bold">{plan.name}</p>
+                    {plan.current && <Badge className="bg-primary text-primary-foreground text-xs">Current</Badge>}
+                  </div>
+                  <p className="text-2xl font-heading font-bold">{plan.price}<span className="text-sm font-normal text-muted-foreground">{plan.period}</span></p>
+                  <div className="space-y-1.5 mt-3 mb-4">
+                    {plan.features.map((f, j) => (
+                      <div key={j} className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        {f}
+                      </div>
+                    ))}
+                  </div>
+                  <Button size="sm" className="w-full" variant={plan.current ? "outline" : "default"} disabled={plan.current}>
+                    {plan.current ? "Current Plan" : "Switch Plan"}
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Add-ons */}
+          <div>
+            <h3 className="font-heading font-semibold mb-1">Add-On Modules</h3>
+            <p className="text-sm text-muted-foreground mb-3">Extend your plan with powerful add-ons. Only pay for what you use.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                {
+                  name: "AI Voice Receptionist",
+                  price: "$199–$999/mo",
+                  desc: "24/7 AI front desk — books, reschedules, answers FAQs, handles missed calls.",
+                  active: false,
+                  tag: "Popular"
+                },
+                {
+                  name: "Revenue Recovery Add-On",
+                  price: "5–10% of recovered revenue",
+                  desc: "AI automatically recovers denied claims & lost revenue. You only pay when we recover.",
+                  active: true,
+                  tag: "Performance-Based",
+                  example: "Example: $20K recovered → you earn $1,000–$2,000/mo"
+                },
+                {
+                  name: "Billing Automation",
+                  price: "$299–$999/mo",
+                  desc: "AI coding assistant, prior auth automation, underpayment detection, text-to-pay.",
+                  active: false,
+                  tag: null
+                },
+                {
+                  name: "Multi-Location",
+                  price: "$499+/mo per location",
+                  desc: "Add additional clinic locations with full benchmarking and cross-location analytics.",
+                  active: true,
+                  tag: null
+                },
+              ].map((addon, i) => (
+                <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+                  className="bg-card rounded-xl border border-border p-5">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm">{addon.name}</p>
+                        {addon.tag && <Badge className="bg-amber-100 text-amber-700 text-xs">{addon.tag}</Badge>}
+                        {addon.active && <Badge className="bg-emerald-100 text-emerald-700 text-xs">Active</Badge>}
+                      </div>
+                      <p className="text-sm font-medium text-primary mt-0.5">{addon.price}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">{addon.desc}</p>
+                  {addon.example && (
+                    <p className="text-xs bg-emerald-50 text-emerald-700 rounded-lg px-3 py-1.5 mb-3">{addon.example}</p>
+                  )}
+                  <Button size="sm" variant={addon.active ? "outline" : "default"} className="w-full">
+                    {addon.active ? "Manage" : "Add to Plan"}
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       )}
