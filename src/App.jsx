@@ -34,6 +34,8 @@ import PredictiveAnalytics from '@/pages/PredictiveAnalytics';
 import BusinessConsultant from '@/pages/BusinessConsultant';
 import Settings from '@/pages/Settings';
 import VoiceReceptionist from '@/pages/VoiceReceptionist';
+import Training from '@/pages/Training';
+import Subscription from '@/pages/Subscription';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -88,6 +90,8 @@ const AuthenticatedApp = () => {
           <Route path="/business-consultant" element={<BusinessConsultant />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/voice-receptionist" element={<VoiceReceptionist />} />
+          <Route path="/training" element={<Training />} />
+          <Route path="/subscription" element={<Subscription />} />
         </Route>
       </Route>
 

@@ -5,7 +5,7 @@ import {
   Star, MessageSquare, Phone, BarChart3, Bot,
   FileText, UserPlus, Building2, ChevronLeft, ChevronRight,
   Activity, BrainCircuit, Mic, GitBranch, Eye, MapPin,
-  LineChart, Briefcase, Settings, Award
+  LineChart, Briefcase, Settings, Award, BookOpen, CreditCard
 } from "lucide-react";
 import { useState } from "react";
 
@@ -58,7 +58,9 @@ const navGroups = [
     label: "Enterprise",
     items: [
       { label: "Multi-Location", icon: MapPin, path: "/multi-location" },
+      { label: "Plan & Billing", icon: CreditCard, path: "/subscription" },
       { label: "Settings", icon: Settings, path: "/settings" },
+      { label: "Training Center", icon: BookOpen, path: "/training" },
     ]
   }
 ];

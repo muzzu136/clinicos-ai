@@ -5,6 +5,7 @@ import ClaimsOverview from "@/components/dashboard/ClaimsOverview";
 import AIInsights from "@/components/dashboard/AIInsights";
 import TodaySchedule from "@/components/dashboard/TodaySchedule";
 import ProviderPerformance from "@/components/dashboard/ProviderPerformance";
+import RecoveryRevenueWidget from "@/components/dashboard/RecoveryRevenueWidget";
 import {
   DollarSign, Users, Calendar, TrendingUp,
   FileText, Phone, Star, UserPlus
@@ -53,6 +54,11 @@ export default function Dashboard() {
         <TodaySchedule />
         <AIInsights />
         <ProviderPerformance />
+      </div>
+
+      {/* Recovery Widget */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <RecoveryRevenueWidget />
       </div>
     </div>
   );
