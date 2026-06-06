@@ -36,6 +36,7 @@ import Settings from '@/pages/Settings';
 import VoiceReceptionist from '@/pages/VoiceReceptionist';
 import Training from '@/pages/Training';
 import Subscription from '@/pages/Subscription';
+import BillingReport from '@/pages/BillingReport';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,6 +75,7 @@ const AuthenticatedApp = () => {
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/revenue-cycle" element={<RevenueCycle />} />
           <Route path="/claims" element={<Claims />} />
+          <Route path="/billing-report" element={<BillingReport />} />
           <Route path="/financials" element={<Financials />} />
           <Route path="/campaigns" element={<Campaigns />} />
           <Route path="/reputation" element={<Reputation />} />

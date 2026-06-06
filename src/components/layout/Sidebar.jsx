@@ -33,6 +33,7 @@ const navGroups = [
     items: [
       { label: "Revenue Cycle", icon: DollarSign, path: "/revenue-cycle" },
       { label: "Claims", icon: FileText, path: "/claims" },
+      { label: "Billing Report", icon: DollarSign, path: "/billing-report" },
       { label: "Financial Intel", icon: BarChart3, path: "/financials" },
       { label: "Predictive Analytics", icon: LineChart, path: "/predictive-analytics" },
     ]
