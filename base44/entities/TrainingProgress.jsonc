@@ -1,0 +1,23 @@
+{
+  "name": "TrainingProgress",
+  "type": "object",
+  "properties": {
+    "module_category": {
+      "type": "string",
+      "description": "Training module category name"
+    },
+    "lesson_title": {
+      "type": "string",
+      "description": "Lesson title"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the lesson is completed"
+    }
+  },
+  "required": [
+    "module_category",
+    "lesson_title"
+  ]
+}

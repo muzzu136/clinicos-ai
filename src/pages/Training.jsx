@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import {
   Award, Clock, Search
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { base44 } from "@/api/base44Client";
 
 const modules = [
   {
@@ -91,14 +92,63 @@ const typeConfig = {
 };
 
 const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
-const completedLessons = modules.reduce((s, m) => s + m.lessons.filter(l => l.completed).length, 0);
-const overallProgress = Math.round((completedLessons / totalLessons) * 100);
 
 export default function Training() {
   const [search, setSearch] = useState("");
   const [activeModule, setActiveModule] = useState(null);
+  const [lessons, setLessons] = useState(modules);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = modules.filter(m =>
+  useEffect(() => {
+    const loadProgress = async () => {
+      try {
+        const progress = await base44.entities.TrainingProgress.list();
+        const progressMap = {};
+        progress.forEach(p => {
+          progressMap[`${p.module_category}|${p.lesson_title}`] = p.completed;
+        });
+
+        const updatedModules = modules.map(m => ({
+          ...m,
+          lessons: m.lessons.map(l => ({
+            ...l,
+            completed: progressMap[`${m.category}|${l.title}`] ?? l.completed
+          }))
+        }));
+        setLessons(updatedModules);
+      } catch (e) {
+        console.error("Failed to load training progress:", e);
+      }
+      setLoading(false);
+    };
+    loadProgress();
+  }, []);
+
+  const saveProgress = async (moduleCategory, lessonTitle, completed) => {
+    try {
+      const existing = await base44.entities.TrainingProgress.filter({
+        module_category: moduleCategory,
+        lesson_title: lessonTitle
+      });
+
+      if (existing.length > 0) {
+        await base44.entities.TrainingProgress.update(existing[0].id, { completed });
+      } else {
+        await base44.entities.TrainingProgress.create({
+          module_category: moduleCategory,
+          lesson_title: lessonTitle,
+          completed
+        });
+      }
+    } catch (e) {
+      console.error("Failed to save progress:", e);
+    }
+  };
+
+  const completedLessons = lessons.reduce((s, m) => s + m.lessons.filter(l => l.completed).length, 0);
+  const overallProgress = Math.round((completedLessons / totalLessons) * 100);
+
+  const filtered = lessons.filter(m =>
     m.category.toLowerCase().includes(search.toLowerCase()) ||
     m.lessons.some(l => l.title.toLowerCase().includes(search.toLowerCase()))
   );
@@ -205,8 +255,20 @@ export default function Training() {
                           <Badge className={`text-[10px] ${typeConfig[lesson.type].color}`}>{typeConfig[lesson.type].label}</Badge>
                         </div>
                       </div>
-                      <Button size="sm" variant={lesson.completed ? "ghost" : "outline"} className="shrink-0 text-xs h-7">
-                        {lesson.completed ? "Review" : "Start"}
+                      <Button
+                        size="sm"
+                        variant={lesson.completed ? "ghost" : "outline"}
+                        className="shrink-0 text-xs h-7"
+                        onClick={() => {
+                          const newCompleted = !lesson.completed;
+                          setLessons(prev => prev.map(m => m.category === mod.category ? {
+                            ...m,
+                            lessons: m.lessons.map(l => l.title === lesson.title ? { ...l, completed: newCompleted } : l)
+                          } : m));
+                          saveProgress(mod.category, lesson.title, newCompleted);
+                        }}
+                      >
+                        {lesson.completed ? "Undo" : "Mark Complete"}
                       </Button>
                     </motion.div>
                   ))}
