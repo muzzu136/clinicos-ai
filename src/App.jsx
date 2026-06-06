@@ -37,6 +37,9 @@ import VoiceReceptionist from '@/pages/VoiceReceptionist';
 import Training from '@/pages/Training';
 import Subscription from '@/pages/Subscription';
 import BillingReport from '@/pages/BillingReport';
+import CustomerDashboard from '@/pages/CustomerDashboard';
+import CustomerPatients from '@/pages/CustomerPatients';
+import SubscriptionPlans from '@/pages/SubscriptionPlans';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,6 +74,8 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/customer/patients" element={<CustomerPatients />} />
           <Route path="/patients" element={<Patients />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/revenue-cycle" element={<RevenueCycle />} />
@@ -94,6 +99,7 @@ const AuthenticatedApp = () => {
           <Route path="/voice-receptionist" element={<VoiceReceptionist />} />
           <Route path="/training" element={<Training />} />
           <Route path="/subscription" element={<Subscription />} />
+          <Route path="/pricing" element={<SubscriptionPlans />} />
         </Route>
       </Route>
 

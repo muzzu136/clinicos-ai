@@ -2,6 +2,10 @@
   "name": "Appointment",
   "type": "object",
   "properties": {
+    "clinic_id": {
+      "type": "string",
+      "description": "Associated clinic ID"
+    },
     "patient_id": {
       "type": "string"
     },
@@ -58,6 +62,7 @@
     }
   },
   "required": [
+    "clinic_id",
     "patient_name",
     "provider_name",
     "appointment_date"

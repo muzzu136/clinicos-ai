@@ -2,6 +2,10 @@
   "name": "Campaign",
   "type": "object",
   "properties": {
+    "clinic_id": {
+      "type": "string",
+      "description": "Associated clinic ID"
+    },
     "name": {
       "type": "string"
     },
@@ -67,6 +71,7 @@
     }
   },
   "required": [
+    "clinic_id",
     "name",
     "type"
   ]
