@@ -40,6 +40,9 @@ import BillingReport from '@/pages/BillingReport';
 import CustomerDashboard from '@/pages/CustomerDashboard';
 import CustomerPatients from '@/pages/CustomerPatients';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
+import ClinicOnboarding from '@/pages/ClinicOnboarding';
+import AdminClinicManagement from '@/pages/AdminClinicManagement';
+import { ClinicProvider } from '@/components/ClinicContext';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -70,6 +73,7 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/onboarding" element={<ClinicOnboarding />} />
 
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<AppLayout />}>
@@ -100,6 +104,7 @@ const AuthenticatedApp = () => {
           <Route path="/training" element={<Training />} />
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/pricing" element={<SubscriptionPlans />} />
+          <Route path="/admin/clinics" element={<AdminClinicManagement />} />
         </Route>
       </Route>
 
@@ -111,12 +116,14 @@ const AuthenticatedApp = () => {
 function App() {
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
+      <ClinicProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
           <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </ClinicProvider>
     </AuthProvider>
   )
 }

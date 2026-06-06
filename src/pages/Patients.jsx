@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Search, Plus, AlertTriangle, UserCheck, UserX, Users, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 
 const statusConfig = {
   active: { label: "Active", color: "bg-emerald-100 text-emerald-700" },
@@ -19,6 +20,7 @@ const statusConfig = {
 };
 
 export default function Patients() {
+  const { clinicId } = useClinic();
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [patients, setPatients] = useState([]);
@@ -30,7 +32,7 @@ export default function Patients() {
       setLoading(true);
       setError(null);
       try {
-        const res = await base44.functions.invoke("awsPatients", { action: "list" });
+        const res = await base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId });
         const raw = res.data;
         const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.patients) ? raw.patients : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
         setPatients(list);
@@ -39,8 +41,10 @@ export default function Patients() {
       }
       setLoading(false);
     };
-    fetchPatients();
-  }, []);
+    if (clinicId) {
+      fetchPatients();
+    }
+  }, [clinicId]);
 
   const filtered = patients.filter(p => {
     const name = p.name || `${p.first_name || ""} ${p.last_name || ""}`.trim();
