@@ -1,43 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import {
-  Calendar, Clock, Plus, Users, TrendingUp, AlertTriangle,
-  CheckCircle2, XCircle, Video, Stethoscope
-} from "lucide-react";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from "recharts";
-
-const weekData = [
-  { day: "Mon", scheduled: 42, completed: 38, noShow: 3 },
-  { day: "Tue", scheduled: 48, completed: 44, noShow: 2 },
-  { day: "Wed", scheduled: 45, completed: 40, noShow: 4 },
-  { day: "Thu", scheduled: 50, completed: 46, noShow: 1 },
-  { day: "Fri", scheduled: 38, completed: 35, noShow: 2 },
-];
-
-const upcomingAppointments = [
-  { time: "9:00 AM", patient: "Sarah Johnson", type: "Follow-up", provider: "Dr. Martinez", status: "confirmed", mode: "in-person" },
-  { time: "9:30 AM", patient: "Michael Chen", type: "New Patient", provider: "Dr. Martinez", status: "confirmed", mode: "in-person" },
-  { time: "10:00 AM", patient: "Emily Davis", type: "Wellness", provider: "Dr. Patel", status: "waitlisted", mode: "telehealth" },
-  { time: "10:30 AM", patient: "James Wilson", type: "Follow-up", provider: "Dr. Patel", status: "confirmed", mode: "in-person" },
-  { time: "11:00 AM", patient: "Maria Garcia", type: "Urgent", provider: "Dr. Kim", status: "pending", mode: "in-person" },
-  { time: "1:00 PM", patient: "Robert Lee", type: "Procedure", provider: "Dr. Cooper", status: "confirmed", mode: "in-person" },
-  { time: "2:00 PM", patient: "Lisa Anderson", type: "Telehealth", provider: "Dr. Kim", status: "confirmed", mode: "telehealth" },
-];
+import { Calendar, Clock, Plus, TrendingUp, XCircle, Video, Loader2 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { base44 } from "@/api/base44Client";
 
 const statusColors = {
+  scheduled: "bg-primary/10 text-primary",
   confirmed: "bg-emerald-100 text-emerald-700",
   pending: "bg-amber-100 text-amber-700",
-  waitlisted: "bg-primary/10 text-primary",
+  checked_in: "bg-sky-100 text-sky-700",
+  in_progress: "bg-violet-100 text-violet-700",
+  completed: "bg-emerald-100 text-emerald-700",
+  no_show: "bg-red-100 text-red-700",
   cancelled: "bg-red-100 text-red-700",
+  rescheduled: "bg-amber-100 text-amber-700",
 };
 
 export default function Appointments() {
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await base44.functions.invoke("awsAppointments", { action: "list" });
+        setAppointments(res.data || []);
+      } catch (e) {
+        setError(e.message);
+      }
+      setLoading(false);
+    };
+    fetchAppointments();
+  }, []);
+
+  const today = appointments.filter(a => {
+    if (!a.appointment_date) return false;
+    return new Date(a.appointment_date).toDateString() === new Date().toDateString();
+  });
+
+  const confirmed = appointments.filter(a => a.status === "confirmed").length;
+  const noShows = appointments.filter(a => a.status === "no_show").length;
+
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekData = days.map(day => {
+    const dayApts = appointments.filter(a => a.appointment_date && days[new Date(a.appointment_date).getDay()] === day);
+    return {
+      day,
+      completed: dayApts.filter(a => a.status === "completed").length,
+      noShow: dayApts.filter(a => a.status === "no_show").length,
+    };
+  });
+
+  const providerMap = {};
+  appointments.forEach(a => {
+    if (!a.provider_name) return;
+    providerMap[a.provider_name] = (providerMap[a.provider_name] || 0) + 1;
+  });
+  const maxCount = Math.max(...Object.values(providerMap), 1);
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
@@ -45,43 +71,30 @@ export default function Appointments() {
           <h1 className="text-2xl font-heading font-bold text-foreground">Smart Appointments</h1>
           <p className="text-sm text-muted-foreground mt-0.5">AI-optimized scheduling & capacity management</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" /> New Appointment
-        </Button>
+        <Button className="gap-2"><Plus className="w-4 h-4" /> New Appointment</Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Today's Appointments", value: "48", icon: Calendar, color: "bg-primary/10 text-primary" },
-          { label: "Schedule Utilization", value: "87%", icon: TrendingUp, color: "bg-emerald-50 text-emerald-600" },
-          { label: "No-Show Rate", value: "4.2%", icon: XCircle, color: "bg-red-50 text-red-500" },
-          { label: "Waitlisted", value: "12", icon: Clock, color: "bg-amber-50 text-amber-600" },
-          { label: "Open Slots", value: "6", icon: AlertTriangle, color: "bg-violet-50 text-violet-600" },
+          { label: "Today's Appointments", value: today.length, icon: Calendar, color: "bg-primary/10 text-primary" },
+          { label: "Confirmed", value: confirmed, icon: TrendingUp, color: "bg-emerald-50 text-emerald-600" },
+          { label: "No-Shows", value: noShows, icon: XCircle, color: "bg-red-50 text-red-500" },
+          { label: "Total", value: appointments.length, icon: Clock, color: "bg-amber-50 text-amber-600" },
         ].map((stat, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="bg-card rounded-xl border border-border p-4"
-          >
+          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+            className="bg-card rounded-xl border border-border p-4">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${stat.color}`}>
               <stat.icon className="w-4 h-4" />
             </div>
-            <p className="text-xl font-heading font-bold">{stat.value}</p>
+            <p className="text-xl font-heading font-bold">{loading ? "—" : stat.value}</p>
             <p className="text-xs text-muted-foreground">{stat.label}</p>
           </motion.div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Weekly Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="lg:col-span-2 bg-card rounded-2xl border border-border p-6"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="lg:col-span-2 bg-card rounded-2xl border border-border p-6">
           <h3 className="font-heading font-semibold mb-4">This Week's Appointments</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={weekData}>
@@ -95,56 +108,60 @@ export default function Appointments() {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Provider Utilization */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card rounded-2xl border border-border p-6"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="bg-card rounded-2xl border border-border p-6">
           <h3 className="font-heading font-semibold mb-4">Provider Load</h3>
-          <div className="space-y-4">
-            {[
-              { name: "Dr. Martinez", util: 92, slots: "18/20" },
-              { name: "Dr. Patel", util: 87, slots: "17/20" },
-              { name: "Dr. Kim", util: 78, slots: "15/20" },
-              { name: "Dr. Cooper", util: 85, slots: "17/20" },
-            ].map((p, i) => (
-              <div key={i}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="font-medium">{p.name}</span>
-                  <span className="text-muted-foreground">{p.slots} slots</span>
+          {loading ? (
+            <div className="flex items-center justify-center h-32 text-muted-foreground gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" /> Loading...
+            </div>
+          ) : Object.keys(providerMap).length === 0 ? (
+            <p className="text-sm text-muted-foreground">No appointment data yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(providerMap).slice(0, 5).map(([name, count], i) => (
+                <div key={i}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-medium">{name}</span>
+                    <span className="text-muted-foreground">{count} apts</span>
+                  </div>
+                  <Progress value={(count / maxCount) * 100} className="h-2" />
                 </div>
-                <Progress value={p.util} className="h-2" />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
 
-      {/* Today's Schedule */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-card rounded-2xl border border-border p-6"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+        className="bg-card rounded-2xl border border-border p-6">
         <h3 className="font-heading font-semibold mb-4">Today's Schedule</h3>
-        <div className="space-y-2">
-          {upcomingAppointments.map((apt, i) => (
-            <div key={i} className="flex items-center gap-4 p-3 rounded-xl border border-border hover:border-primary/20 transition-colors">
-              <span className="text-sm font-mono text-muted-foreground w-20 shrink-0">{apt.time}</span>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{apt.patient}</p>
-                <p className="text-xs text-muted-foreground">{apt.provider} · {apt.type}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {apt.mode === "telehealth" && <Video className="w-4 h-4 text-primary" />}
-                <Badge className={statusColors[apt.status]}>{apt.status}</Badge>
-              </div>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin" /> Loading schedule...
+          </div>
+        ) : today.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-12">No appointments scheduled for today.</p>
+        ) : (
+          <div className="space-y-2">
+            {today.map((apt, i) => {
+              const time = new Date(apt.appointment_date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+              return (
+                <div key={i} className="flex items-center gap-4 p-3 rounded-xl border border-border hover:border-primary/20 transition-colors">
+                  <span className="text-sm font-mono text-muted-foreground w-20 shrink-0">{time}</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{apt.patient_name}</p>
+                    <p className="text-xs text-muted-foreground">{apt.provider_name} · {apt.type}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {apt.type === "telehealth" && <Video className="w-4 h-4 text-primary" />}
+                    <Badge className={statusColors[apt.status] || "bg-muted text-muted-foreground"}>{apt.status}</Badge>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </motion.div>
     </div>
   );
