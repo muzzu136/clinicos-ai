@@ -30,7 +30,9 @@ export default function Appointments() {
       setError(null);
       try {
         const res = await base44.functions.invoke("awsAppointments", { action: "list" });
-        setAppointments(res.data || []);
+        const raw = res.data;
+        const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.appointments) ? raw.appointments : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
+        setAppointments(list);
       } catch (e) {
         setError(e.message);
       }

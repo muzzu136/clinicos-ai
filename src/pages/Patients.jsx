@@ -31,7 +31,9 @@ export default function Patients() {
       setError(null);
       try {
         const res = await base44.functions.invoke("awsPatients", { action: "list" });
-        setPatients(res.data || []);
+        const raw = res.data;
+        const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.patients) ? raw.patients : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
+        setPatients(list);
       } catch (e) {
         setError(e.message);
       }

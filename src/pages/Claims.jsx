@@ -32,7 +32,9 @@ export default function Claims() {
       setError(null);
       try {
         const res = await base44.functions.invoke("awsClaims", { action: "list" });
-        setClaims(res.data || []);
+        const raw = res.data;
+        const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.claims) ? raw.claims : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
+        setClaims(list);
       } catch (e) {
         setError(e.message);
       }
