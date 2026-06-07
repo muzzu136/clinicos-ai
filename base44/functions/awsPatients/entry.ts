@@ -35,6 +35,7 @@ Deno.serve(async (req) => {
       method = 'DELETE';
     }
 
+    console.log('Calling URL:', url, 'Method:', method);
     const response = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
