@@ -31,10 +31,11 @@ Deno.serve(async (req) => {
     }).catch(() => null);
 
     // Return IVR response
+    const origin = req.headers.get('origin') || 'https://clinicosai.org';
     return new Response(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say>Welcome to our clinic. Please wait while we connect you to an available representative.</Say>
-  <Enqueue waitUrl="https://your-domain.com/hold-music">clinic-queue</Enqueue>
+  <Play loop="0">https://demo.twilio.com/docs/classic.mp3</Play>
 </Response>`, { 
       status: 200, 
       headers: { 'Content-Type': 'application/xml' } 

@@ -17,7 +17,13 @@ Deno.serve(async (req) => {
 
     // Verify Stripe signature using async crypto
     const encoder = new TextEncoder();
-    const [timestamp, sig] = signature.split(',')[0].replace('t=', '') && signature.split('v1=');
+    const parts = {};
+    signature.split(',').forEach(part => {
+      const [k, v] = part.split('=');
+      parts[k] = v;
+    });
+    const timestamp = parts['t'];
+    const sig = parts['v1'];
     const signedContent = `${timestamp}.${body}`;
     const key = await crypto.subtle.importKey('raw', encoder.encode(stripeSecret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
     const computed = await crypto.subtle.sign('HMAC', key, encoder.encode(signedContent));

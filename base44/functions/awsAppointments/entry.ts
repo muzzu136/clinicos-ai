@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { action, id, data } = await req.json();
+    const { action, id, data, clinic_id } = await req.json();
 
     let url = `${API_URL}/appointments`;
     let method = 'GET';
@@ -18,6 +18,7 @@ Deno.serve(async (req) => {
 
     if (action === 'list') {
       method = 'GET';
+      if (clinic_id) url += `?clinic_id=${encodeURIComponent(clinic_id)}`;
     } else if (action === 'get') {
       url = `${API_URL}/appointments/${id}`;
       method = 'GET';
