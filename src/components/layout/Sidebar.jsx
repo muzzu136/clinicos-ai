@@ -5,7 +5,7 @@ import {
   Star, MessageSquare, Phone, BarChart3, Bot,
   FileText, UserPlus, Building2, ChevronLeft, ChevronRight,
   Activity, BrainCircuit, Mic, GitBranch, Eye, MapPin,
-  LineChart, Briefcase, Settings, Award, BookOpen, CreditCard
+  LineChart, Briefcase, Settings, Award, BookOpen, CreditCard, ShieldAlert
 } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +33,7 @@ const navGroups = [
     items: [
       { label: "Revenue Cycle", icon: DollarSign, path: "/revenue-cycle" },
       { label: "Claims", icon: FileText, path: "/claims" },
+      { label: "Claim Intelligence", icon: ShieldAlert, path: "/claim-intelligence" },
       { label: "Billing Report", icon: DollarSign, path: "/billing-report" },
       { label: "Financial Intel", icon: BarChart3, path: "/financials" },
       { label: "Predictive Analytics", icon: LineChart, path: "/predictive-analytics" },

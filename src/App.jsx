@@ -42,6 +42,7 @@ import CustomerPatients from '@/pages/CustomerPatients';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
 import ClinicOnboarding from '@/pages/ClinicOnboarding';
 import AdminClinicManagement from '@/pages/AdminClinicManagement';
+import ClaimIntelligence from '@/pages/ClaimIntelligence';
 import { ClinicProvider } from '@/components/ClinicContext';
 
 const AuthenticatedApp = () => {
@@ -105,6 +106,7 @@ const AuthenticatedApp = () => {
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/pricing" element={<SubscriptionPlans />} />
           <Route path="/admin/clinics" element={<AdminClinicManagement />} />
+          <Route path="/claim-intelligence" element={<ClaimIntelligence />} />
         </Route>
       </Route>
 

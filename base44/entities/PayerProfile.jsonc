@@ -1,0 +1,50 @@
+{
+  "name": "PayerProfile",
+  "type": "object",
+  "properties": {
+    "clinic_id": {
+      "type": "string",
+      "description": "Associated clinic ID"
+    },
+    "payer_name": {
+      "type": "string"
+    },
+    "avg_days_to_pay": {
+      "type": "number",
+      "default": 0
+    },
+    "denial_rate": {
+      "type": "number",
+      "default": 0,
+      "description": "Percentage 0-100"
+    },
+    "appeal_success_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "top_denial_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "known_issues": {
+      "type": "string",
+      "description": "Payer-specific quirks and patterns"
+    },
+    "performance_tier": {
+      "type": "string",
+      "enum": [
+        "excellent",
+        "good",
+        "fair",
+        "poor"
+      ],
+      "default": "good"
+    }
+  },
+  "required": [
+    "clinic_id",
+    "payer_name"
+  ]
+}

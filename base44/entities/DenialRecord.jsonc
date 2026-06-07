@@ -1,0 +1,113 @@
+{
+  "name": "DenialRecord",
+  "type": "object",
+  "properties": {
+    "clinic_id": {
+      "type": "string",
+      "description": "Associated clinic ID"
+    },
+    "claim_number": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "provider_name": {
+      "type": "string"
+    },
+    "payer_name": {
+      "type": "string"
+    },
+    "service_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "amount_billed": {
+      "type": "number"
+    },
+    "denial_code": {
+      "type": "string",
+      "description": "e.g. CO-16, CO-97, PR-1"
+    },
+    "denial_reason": {
+      "type": "string",
+      "description": "Raw reason from payer"
+    },
+    "denial_category": {
+      "type": "string",
+      "enum": [
+        "coding_error",
+        "missing_info",
+        "duplicate",
+        "auth_required",
+        "eligibility",
+        "timely_filing",
+        "medical_necessity",
+        "other"
+      ],
+      "default": "other"
+    },
+    "ai_explanation": {
+      "type": "string",
+      "description": "Plain-English AI explanation"
+    },
+    "ai_recommended_action": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "identified",
+        "in_progress",
+        "resubmitted",
+        "recovered",
+        "written_off"
+      ],
+      "default": "identified"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "action_needed",
+        "resolved"
+      ],
+      "default": "action_needed"
+    },
+    "appeal_drafted": {
+      "type": "boolean",
+      "default": false
+    },
+    "appeal_submitted": {
+      "type": "boolean",
+      "default": false
+    },
+    "appeal_outcome": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "won",
+        "lost"
+      ]
+    },
+    "recovery_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "days_outstanding": {
+      "type": "number",
+      "default": 0
+    },
+    "filing_deadline": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "clinic_id",
+    "claim_number",
+    "payer_name",
+    "amount_billed",
+    "denial_code"
+  ]
+}

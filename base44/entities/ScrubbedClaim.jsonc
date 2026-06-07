@@ -1,0 +1,72 @@
+{
+  "name": "ScrubbedClaim",
+  "type": "object",
+  "properties": {
+    "clinic_id": {
+      "type": "string",
+      "description": "Associated clinic ID"
+    },
+    "claim_number": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "provider_name": {
+      "type": "string"
+    },
+    "payer_name": {
+      "type": "string"
+    },
+    "service_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "amount_billed": {
+      "type": "number"
+    },
+    "cpt_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "icd_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "npi": {
+      "type": "string"
+    },
+    "confidence_score": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 payment likelihood"
+    },
+    "issues_count": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "rejected",
+        "submitted"
+      ],
+      "default": "pending_review"
+    },
+    "ai_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "clinic_id",
+    "claim_number",
+    "payer_name",
+    "amount_billed"
+  ]
+}
