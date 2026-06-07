@@ -12,7 +12,8 @@ Deno.serve(async (req) => {
 
     const { action, id, data, clinic_id } = await req.json();
 
-    let url = `${API_URL}/appointments`;
+    const BASE = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+    let url = `${BASE}/appointments`;
     let method = 'GET';
     let body = undefined;
 
@@ -20,17 +21,17 @@ Deno.serve(async (req) => {
       method = 'GET';
       if (clinic_id) url += `?clinic_id=${encodeURIComponent(clinic_id)}`;
     } else if (action === 'get') {
-      url = `${API_URL}/appointments/${id}`;
+      url = `${BASE}/appointments/${id}`;
       method = 'GET';
     } else if (action === 'create') {
       method = 'POST';
       body = JSON.stringify(data);
     } else if (action === 'update') {
-      url = `${API_URL}/appointments/${id}`;
+      url = `${BASE}/appointments/${id}`;
       method = 'PUT';
       body = JSON.stringify(data);
     } else if (action === 'delete') {
-      url = `${API_URL}/appointments/${id}`;
+      url = `${BASE}/appointments/${id}`;
       method = 'DELETE';
     }
 
