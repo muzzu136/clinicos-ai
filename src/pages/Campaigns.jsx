@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import CreateCampaignDialog from "@/components/campaigns/CreateCampaignDialog";
 
 const campaigns = [
   {
@@ -93,15 +94,11 @@ export default function Campaigns() {
         <Button onClick={() => setShowNewDialog(true)} className="gap-2">
           <Plus className="w-4 h-4" /> Create Campaign
         </Button>
-        {showNewDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
-              <h2 className="text-lg font-semibold mb-4">Create Campaign</h2>
-              <p className="text-sm text-muted-foreground mb-4">Campaign builder coming soon</p>
-              <Button onClick={() => setShowNewDialog(false)} variant="outline" className="w-full">Close</Button>
-            </div>
-          </div>
-        )}
+        <CreateCampaignDialog 
+          open={showNewDialog} 
+          onClose={() => setShowNewDialog(false)} 
+          onSuccess={() => window.location.reload()}
+        />
       </div>
 
       {/* Stats */}

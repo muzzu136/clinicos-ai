@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Calendar, Clock, Plus, TrendingUp, XCircle, Video, Loader2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { base44 } from "@/api/base44Client";
+import NewAppointmentDialog from "@/components/appointments/NewAppointmentDialog";
 
 const statusColors = {
   scheduled: "bg-primary/10 text-primary",
@@ -25,20 +26,21 @@ export default function Appointments() {
   const [error, setError] = useState(null);
   const [showNewDialog, setShowNewDialog] = useState(false);
 
+  const fetchAppointments = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await base44.functions.invoke("awsAppointments", { action: "list" });
+      const raw = res.data;
+      const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.appointments) ? raw.appointments : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
+      setAppointments(list);
+    } catch (e) {
+      setError(e.message);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchAppointments = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await base44.functions.invoke("awsAppointments", { action: "list" });
-        const raw = res.data;
-        const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.appointments) ? raw.appointments : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
-        setAppointments(list);
-      } catch (e) {
-        setError(e.message);
-      }
-      setLoading(false);
-    };
     fetchAppointments();
   }, []);
 
@@ -75,15 +77,11 @@ export default function Appointments() {
           <p className="text-sm text-muted-foreground mt-0.5">AI-optimized scheduling & capacity management</p>
         </div>
         <Button onClick={() => setShowNewDialog(true)} className="gap-2"><Plus className="w-4 h-4" /> New Appointment</Button>
-        {showNewDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
-              <h2 className="text-lg font-semibold mb-4">New Appointment</h2>
-              <p className="text-sm text-muted-foreground mb-4">Integration with scheduling system coming soon</p>
-              <Button onClick={() => setShowNewDialog(false)} variant="outline" className="w-full">Close</Button>
-            </div>
-          </div>
-        )}
+        <NewAppointmentDialog 
+          open={showNewDialog} 
+          onClose={() => setShowNewDialog(false)} 
+          onSuccess={() => fetchAppointments()}
+        />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
