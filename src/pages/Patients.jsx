@@ -33,6 +33,11 @@ export default function Patients() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchPatients = async () => {
+    if (!clinicId) {
+      setError("No clinic ID available");
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
