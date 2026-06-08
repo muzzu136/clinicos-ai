@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
+import VideoPlayer from "@/components/training/VideoPlayer";
 
 const modules = [
   {
@@ -98,6 +99,7 @@ export default function Training() {
   const [activeModule, setActiveModule] = useState(null);
   const [lessons, setLessons] = useState(modules);
   const [loading, setLoading] = useState(true);
+  const [videoModal, setVideoModal] = useState({ open: false, lesson: null, module: null });
 
   useEffect(() => {
     const loadProgress = async () => {
@@ -260,15 +262,19 @@ export default function Training() {
                         variant={lesson.completed ? "ghost" : "outline"}
                         className="shrink-0 text-xs h-7"
                         onClick={() => {
-                          const newCompleted = !lesson.completed;
-                          setLessons(prev => prev.map(m => m.category === mod.category ? {
-                            ...m,
-                            lessons: m.lessons.map(l => l.title === lesson.title ? { ...l, completed: newCompleted } : l)
-                          } : m));
-                          saveProgress(mod.category, lesson.title, newCompleted);
+                          if (lesson.type === "video") {
+                            setVideoModal({ open: true, lesson: lesson.title, module: mod.category });
+                          } else {
+                            const newCompleted = !lesson.completed;
+                            setLessons(prev => prev.map(m => m.category === mod.category ? {
+                              ...m,
+                              lessons: m.lessons.map(l => l.title === lesson.title ? { ...l, completed: newCompleted } : l)
+                            } : m));
+                            saveProgress(mod.category, lesson.title, newCompleted);
+                          }
                         }}
                       >
-                        {lesson.completed ? "Undo" : "Mark Complete"}
+                        {lesson.completed ? "Undo" : lesson.type === "video" ? "Play" : "Mark Complete"}
                       </Button>
                     </motion.div>
                   ))}
@@ -287,6 +293,22 @@ export default function Training() {
           );
         })}
       </div>
+
+      {/* Video Player Modal */}
+      <VideoPlayer
+        open={videoModal.open}
+        lessonTitle={videoModal.lesson}
+        onClose={() => setVideoModal({ open: false, lesson: null, module: null })}
+        onComplete={() => {
+          if (videoModal.lesson && videoModal.module) {
+            setLessons(prev => prev.map(m => m.category === videoModal.module ? {
+              ...m,
+              lessons: m.lessons.map(l => l.title === videoModal.lesson ? { ...l, completed: true } : l)
+            } : m));
+            saveProgress(videoModal.module, videoModal.lesson, true);
+          }
+        }}
+      />
 
       {/* Quick Tips */}
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
