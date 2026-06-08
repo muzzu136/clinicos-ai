@@ -4,28 +4,28 @@ import { Button } from "@/components/ui/button";
 import { X, Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react";
 
 const lessonVideos = {
-  "Welcome to ClinicOS AI": "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  "Dashboard Overview & Navigation": "https://www.youtube.com/embed/jNQXAC9IVRw",
-  "Setting Up Your Clinic Profile": "https://www.youtube.com/embed/9bZkp7q19f0",
-  "Connecting Your EHR System": "https://www.youtube.com/embed/MYfZeDPK64s",
-  "Understanding the A/R Dashboard": "https://www.youtube.com/embed/kJQP7kiw9Fk",
-  "How the AI Claim Scrubber Works": "https://www.youtube.com/embed/ZZ5B3TgoDiY",
-  "Real-Time Eligibility Verification": "https://www.youtube.com/embed/tYzMGcUty6s",
-  "Denial Management & Auto-Appeals": "https://www.youtube.com/embed/KOxbO0ZN4nE",
-  "Reading Your Payer Performance Report": "https://www.youtube.com/embed/aqz-KE-bpKQ",
-  "Patient Churn Risk Scoring": "https://www.youtube.com/embed/xvFZjo5PgG0",
-  "Launching Your First AI Campaign": "https://www.youtube.com/embed/Yl-Ox7ajz4A",
-  "Referral Network Automation": "https://www.youtube.com/embed/KO-m8L-SaJk",
-  "Reputation & Review Management": "https://www.youtube.com/embed/4zqZUkpPu20",
-  "How the AI Receptionist Handles Calls": "https://www.youtube.com/embed/Lp-Y4CUy0QE",
-  "Configuring Call Flows & Scripts": "https://www.youtube.com/embed/1dJHaI2B7Xo",
-  "Missed Call Recovery & Follow-Up": "https://www.youtube.com/embed/oHg5SJYRHA0",
-  "Asking the AI Copilot the Right Questions": "https://www.youtube.com/embed/j5a0jTc9S0E",
-  "Interpreting AI Business Reports": "https://www.youtube.com/embed/qhbuKbxJsk8",
-  "Setting KPI Targets & Tracking Progress": "https://www.youtube.com/embed/K5KAc_DtXbE",
-  "Predictive Revenue Forecasting": "https://www.youtube.com/embed/PL6gx4Dj-JE",
-  "Staff Productivity Analytics": "https://www.youtube.com/embed/YQHsXMglC9A",
-  "Multi-Location Benchmarking": "https://www.youtube.com/embed/dxCFCRF0g8w"
+  "Welcome to ClinicOS AI": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/18fc68dfe_generated_video.mp4",
+  "Dashboard Overview & Navigation": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/18373a758_generated_video.mp4",
+  "Setting Up Your Clinic Profile": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/a1a2fcf12_generated_video.mp4",
+  "Connecting Your EHR System": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/d13005bee_generated_video.mp4",
+  "Understanding the A/R Dashboard": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/0ff77d5d9_generated_video.mp4",
+  "How the AI Claim Scrubber Works": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/336d5f076_generated_video.mp4",
+  "Real-Time Eligibility Verification": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/66e132081_generated_video.mp4",
+  "Denial Management & Auto-Appeals": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/72e56be75_generated_video.mp4",
+  "Reading Your Payer Performance Report": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/6b17a7a2e_generated_video.mp4",
+  "Patient Churn Risk Scoring": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/b0669f717_generated_video.mp4",
+  "Launching Your First AI Campaign": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/87bd83317_generated_video.mp4",
+  "Referral Network Automation": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/eff6bf347_generated_video.mp4",
+  "Reputation & Review Management": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/2ef3bf5aa_generated_video.mp4",
+  "How the AI Receptionist Handles Calls": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/19ce02eb9_generated_video.mp4",
+  "Configuring Call Flows & Scripts": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/10ddc3876_generated_video.mp4",
+  "Missed Call Recovery & Follow-Up": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/71885f458_generated_video.mp4",
+  "Asking the AI Copilot the Right Questions": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/a477aede0_generated_video.mp4",
+  "Interpreting AI Business Reports": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/8b21cd8e1_generated_video.mp4",
+  "Setting KPI Targets & Tracking Progress": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/05718363d_generated_video.mp4",
+  "Predictive Revenue Forecasting": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/680ed636b_generated_video.mp4",
+  "Staff Productivity Analytics": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/672c78dc5_generated_video.mp4",
+  "Multi-Location Benchmarking": "https://media.base44.com/videos/public/6a217ca49d3969e690fe7f0e/dbe1a98c1_generated_video.mp4"
 };
 
 export default function VideoPlayer({ open, lessonTitle, onClose, onComplete }) {
@@ -68,14 +68,13 @@ export default function VideoPlayer({ open, lessonTitle, onClose, onComplete }) 
 
         {/* Video Container */}
         <div className={`bg-black relative ${isFullscreen ? "h-screen" : "aspect-video"}`}>
-          <iframe
+          <video
             width="100%"
             height="100%"
             src={videoUrl}
             title={lessonTitle}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+            controls
+            autoPlay
             className="w-full h-full"
           />
         </div>
