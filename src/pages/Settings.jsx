@@ -8,6 +8,7 @@ import {
   Settings2, Building2, Link2, Shield, Bell, Users,
   CheckCircle2, XCircle, Plug, Zap, CreditCard, Key
 } from "lucide-react";
+import IntegrationConnectDialog from "@/components/dialogs/IntegrationConnectDialog";
 
 const integrations = [
   { category: "EHR / PM Systems", items: [
@@ -53,6 +54,14 @@ export default function Settings() {
   const [notifState, setNotifState] = useState(notifications);
   const [showConnectDialog, setShowConnectDialog] = useState(null);
   const [showSaveDialog, setShowSaveDialog] = useState(null);
+  const [connectedIntegrations, setConnectedIntegrations] = useState({
+    "Tebra (Kareo)": true,
+    "Twilio SMS": true,
+    "RingCentral": true,
+    "Stripe": true,
+    "Availity": true,
+    "Google Calendar": true,
+  });
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto">
@@ -154,21 +163,28 @@ export default function Settings() {
                       <p className="font-medium text-sm">{item.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
                     </div>
-                    {item.connected ? (
+                    {connectedIntegrations[item.name] ? (
                       <div className="flex items-center gap-1 text-xs text-emerald-600 shrink-0">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Connected</span>
                       </div>
                     ) : (
-                       <Button onClick={() => setShowConnectDialog(item.name)} size="sm" variant="outline" className="shrink-0 gap-1 text-xs">
-                         <Plug className="w-3 h-3" />Connect
-                       </Button>
-                     )}
+                      <Button onClick={() => setShowConnectDialog(item.name)} size="sm" variant="outline" className="shrink-0 gap-1 text-xs">
+                        <Plug className="w-3 h-3" />Connect
+                      </Button>
+                    )}
                   </motion.div>
                 ))}
               </div>
             </div>
           ))}
+          </div>
+          <IntegrationConnectDialog 
+          open={!!showConnectDialog} 
+          integration={showConnectDialog} 
+          onClose={() => setShowConnectDialog(null)} 
+          onConnect={(service) => setConnectedIntegrations(prev => ({ ...prev, [service]: true }))} 
+          />
           </div>
           )}
 
