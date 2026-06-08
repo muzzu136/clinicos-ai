@@ -150,6 +150,7 @@ export default function Settings() {
       )}
 
       {tab === "integrations" && (
+        <>
         <div className="space-y-8">
           {integrations.map((group, gi) => (
             <div key={gi}>
@@ -179,14 +180,15 @@ export default function Settings() {
             </div>
           ))}
         </div>
+        </div>
         <IntegrationConnectDialog 
           open={!!showConnectDialog} 
           integration={showConnectDialog} 
           onClose={() => setShowConnectDialog(null)} 
           onConnect={(service) => setConnectedIntegrations(prev => ({ ...prev, [service]: true }))} 
         />
-      </div>
-    )}
+        </>
+      )}
 
           {tab === "notifications" && (
         <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden">
