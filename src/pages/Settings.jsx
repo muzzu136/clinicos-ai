@@ -178,15 +178,15 @@ export default function Settings() {
               </div>
             </div>
           ))}
-          </div>
-          <IntegrationConnectDialog 
+        </div>
+        <IntegrationConnectDialog 
           open={!!showConnectDialog} 
           integration={showConnectDialog} 
           onClose={() => setShowConnectDialog(null)} 
           onConnect={(service) => setConnectedIntegrations(prev => ({ ...prev, [service]: true }))} 
-          />
-          </div>
-          )}
+        />
+      </div>
+    )}
 
           {tab === "notifications" && (
         <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden">
