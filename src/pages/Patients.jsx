@@ -12,6 +12,7 @@ import { Search, Plus, AlertTriangle, UserCheck, UserX, Users, Loader2 } from "l
 import { base44 } from "@/api/base44Client";
 import { useClinic } from "@/components/ClinicContext";
 import AddPatientDialog from "@/components/patients/AddPatientDialog";
+import EditPatientDialog from "@/components/patients/EditPatientDialog";
 
 const statusConfig = {
   active: { label: "Active", color: "bg-emerald-100 text-emerald-700" },
@@ -28,6 +29,8 @@ export default function Patients() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchPatients = async () => {
     setLoading(true);
@@ -132,7 +135,14 @@ export default function Patients() {
                 const churnRisk = patient.churn_risk_score ?? patient.churnRisk ?? 0;
                 const revenue = patient.total_revenue ?? patient.revenue ?? 0;
                 return (
-                  <TableRow key={patient.id || idx} className="cursor-pointer hover:bg-muted/30">
+                  <TableRow 
+                    key={patient.id || idx} 
+                    className="cursor-pointer hover:bg-muted/30"
+                    onClick={() => {
+                      setEditingPatient(patient);
+                      setEditDialogOpen(true);
+                    }}
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
@@ -173,6 +183,17 @@ export default function Patients() {
         onOpenChange={setDialogOpen} 
         clinicId={clinicId}
         onPatientAdded={() => {
+          setLoading(true);
+          fetchPatients();
+        }}
+      />
+
+      <EditPatientDialog 
+        open={editDialogOpen} 
+        onOpenChange={setEditDialogOpen} 
+        patient={editingPatient}
+        clinicId={clinicId}
+        onPatientUpdated={() => {
           setLoading(true);
           fetchPatients();
         }}
