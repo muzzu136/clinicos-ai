@@ -70,7 +70,7 @@ export default function Appointments() {
   const maxCount = Math.max(...Object.values(providerMap), 1);
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-heading font-bold text-foreground">Smart Appointments</h1>
