@@ -169,16 +169,19 @@ export default function Settings() {
               </div>
             </div>
           ))}
-          </div>
-          {showConnectDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-           <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
-             <h2 className="text-lg font-semibold mb-2">Connect {showConnectDialog}</h2>
-             <p className="text-sm text-muted-foreground mb-4">Integration coming soon</p>
-             <Button onClick={() => setShowConnectDialog(null)} variant="outline" className="w-full">Close</Button>
+             </div>
            </div>
-          </div>
+          ))}
+          {showConnectDialog && (
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+             <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+               <h2 className="text-lg font-semibold mb-2">Connect {showConnectDialog}</h2>
+               <p className="text-sm text-muted-foreground mb-4">Integration coming soon</p>
+               <Button onClick={() => setShowConnectDialog(null)} variant="outline" className="w-full">Close</Button>
+             </div>
+           </div>
           )}
+          </div>
           )}
 
           {tab === "notifications" && (
