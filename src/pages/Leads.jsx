@@ -7,6 +7,7 @@ import {
   Plus, UserPlus, TrendingUp, Target, DollarSign,
   Phone, Mail, Globe, ArrowRight
 } from "lucide-react";
+import { useState } from "react";
 
 const leads = [
   { name: "Jennifer Smith", email: "jen@email.com", phone: "(555) 111-2222", source: "Google Ads", service: "Dental Cleaning", status: "new", score: 85, date: "Nov 22" },
@@ -29,6 +30,8 @@ const statusConfig = {
 const sourceIcons = { "Google Ads": Globe, Website: Globe, Referral: UserPlus, Facebook: Globe, "Walk-in": UserPlus };
 
 export default function Leads() {
+  const [showNewDialog, setShowNewDialog] = useState(false);
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
@@ -36,7 +39,16 @@ export default function Leads() {
           <h1 className="text-2xl font-heading font-bold text-foreground">Lead Management</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Patient acquisition CRM & conversion tracking</p>
         </div>
-        <Button className="gap-2"><Plus className="w-4 h-4" /> Add Lead</Button>
+        <Button onClick={() => setShowNewDialog(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Lead</Button>
+        {showNewDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+              <h2 className="text-lg font-semibold mb-4">Add Lead</h2>
+              <p className="text-sm text-muted-foreground mb-4">Lead form coming soon</p>
+              <Button onClick={() => setShowNewDialog(false)} variant="outline" className="w-full">Close</Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

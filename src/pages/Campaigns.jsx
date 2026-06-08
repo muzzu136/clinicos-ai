@@ -7,6 +7,7 @@ import {
   Users, DollarSign, Play, Pause, BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const campaigns = [
   {
@@ -80,6 +81,8 @@ const statusConfig = {
 };
 
 export default function Campaigns() {
+  const [showNewDialog, setShowNewDialog] = useState(false);
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
@@ -87,9 +90,18 @@ export default function Campaigns() {
           <h1 className="text-2xl font-heading font-bold text-foreground">Marketing Campaigns</h1>
           <p className="text-sm text-muted-foreground mt-0.5">AI-powered patient engagement & growth automation</p>
         </div>
-        <Button className="gap-2">
+        <Button onClick={() => setShowNewDialog(true)} className="gap-2">
           <Plus className="w-4 h-4" /> Create Campaign
         </Button>
+        {showNewDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+              <h2 className="text-lg font-semibold mb-4">Create Campaign</h2>
+              <p className="text-sm text-muted-foreground mb-4">Campaign builder coming soon</p>
+              <Button onClick={() => setShowNewDialog(false)} variant="outline" className="w-full">Close</Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats */}

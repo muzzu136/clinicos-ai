@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ThumbsUp, ThumbsDown, MessageSquare, TrendingUp, ExternalLink, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const platforms = [
   { name: "Google", rating: 4.8, count: 247, trend: "+12 this month", color: "bg-primary/10 text-primary" },
@@ -28,6 +29,8 @@ const StarRating = ({ rating }) => (
 );
 
 export default function Reputation() {
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex items-center justify-between">
@@ -35,9 +38,18 @@ export default function Reputation() {
           <h1 className="text-2xl font-heading font-bold text-foreground">Online Reputation</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Monitor, manage & grow your clinic's online presence</p>
         </div>
-        <Button className="gap-2">
+        <Button onClick={() => setShowAIGenerator(true)} className="gap-2">
           <BrainCircuit className="w-4 h-4" /> AI Response Generator
         </Button>
+        {showAIGenerator && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+              <h2 className="text-lg font-semibold mb-4">AI Response Generator</h2>
+              <p className="text-sm text-muted-foreground mb-4">Select a review to generate an AI response</p>
+              <Button onClick={() => setShowAIGenerator(false)} variant="outline" className="w-full">Close</Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Platform Cards */}
@@ -85,7 +97,7 @@ export default function Reputation() {
                   {review.responded ? (
                     <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">Responded</Badge>
                   ) : (
-                    <Button size="sm" variant="outline" className="text-xs gap-1 h-7">
+                    <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => setShowAIGenerator(true)}>
                       <BrainCircuit className="w-3 h-3" /> AI Reply
                     </Button>
                   )}

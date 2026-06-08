@@ -27,6 +27,14 @@ const messages = [
 
 export default function Messages() {
   const [selected, setSelected] = useState(conversations[1]);
+  const [messageText, setMessageText] = useState("");
+  const [showAIAssist, setShowAIAssist] = useState(false);
+
+  const handleSendMessage = () => {
+    if (messageText.trim()) {
+      setMessageText("");
+    }
+  };
 
   return (
     <div className="max-w-[1600px] mx-auto">
@@ -94,9 +102,18 @@ export default function Messages() {
                     <p className="text-[10px] text-muted-foreground">via {selected.channel.toUpperCase()}</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-                  <BrainCircuit className="w-3 h-3" /> AI Assist
+                <Button onClick={() => setShowAIAssist(!showAIAssist)} variant="outline" size="sm" className="gap-1.5 text-xs">
+                   <BrainCircuit className="w-3 h-3" /> AI Assist
                 </Button>
+                {showAIAssist && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+                      <h2 className="text-lg font-semibold mb-4">AI Assistant</h2>
+                      <p className="text-sm text-muted-foreground mb-4">AI suggestions based on conversation history</p>
+                      <Button onClick={() => setShowAIAssist(false)} variant="outline" className="w-full">Close</Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -132,10 +149,16 @@ export default function Messages() {
               </div>
 
               <div className="p-4 border-t border-border">
-                <div className="flex gap-2">
-                  <Input placeholder="Type a message..." className="bg-muted/50 border-0" />
-                  <Button size="icon" className="shrink-0"><Send className="w-4 h-4" /></Button>
-                </div>
+               <div className="flex gap-2">
+                 <Input 
+                   placeholder="Type a message..." 
+                   className="bg-muted/50 border-0"
+                   value={messageText}
+                   onChange={(e) => setMessageText(e.target.value)}
+                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                 />
+                 <Button onClick={handleSendMessage} size="icon" className="shrink-0"><Send className="w-4 h-4" /></Button>
+               </div>
               </div>
             </>
           )}

@@ -23,6 +23,7 @@ export default function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showNewDialog, setShowNewDialog] = useState(false);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -73,7 +74,16 @@ export default function Appointments() {
           <h1 className="text-2xl font-heading font-bold text-foreground">Smart Appointments</h1>
           <p className="text-sm text-muted-foreground mt-0.5">AI-optimized scheduling & capacity management</p>
         </div>
-        <Button className="gap-2"><Plus className="w-4 h-4" /> New Appointment</Button>
+        <Button onClick={() => setShowNewDialog(true)} className="gap-2"><Plus className="w-4 h-4" /> New Appointment</Button>
+        {showNewDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+              <h2 className="text-lg font-semibold mb-4">New Appointment</h2>
+              <p className="text-sm text-muted-foreground mb-4">Integration with scheduling system coming soon</p>
+              <Button onClick={() => setShowNewDialog(false)} variant="outline" className="w-full">Close</Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

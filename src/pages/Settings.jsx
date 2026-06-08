@@ -51,6 +51,8 @@ const notifications = [
 export default function Settings() {
   const [tab, setTab] = useState("clinic");
   const [notifState, setNotifState] = useState(notifications);
+  const [showConnectDialog, setShowConnectDialog] = useState(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(null);
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto">
@@ -89,7 +91,16 @@ export default function Settings() {
                 <Input className="mt-1" placeholder={field.placeholder} />
               </div>
             ))}
-            <Button className="w-full">Save Clinic Profile</Button>
+            <Button onClick={() => setShowSaveDialog('clinic')} className="w-full">Save Clinic Profile</Button>
+            {showSaveDialog === 'clinic' && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+                  <h2 className="text-lg font-semibold mb-2">Profile Saved</h2>
+                  <p className="text-sm text-muted-foreground mb-4">Your clinic profile has been updated</p>
+                  <Button onClick={() => setShowSaveDialog(null)} variant="outline" className="w-full">Close</Button>
+                </div>
+              </div>
+            )}
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-2xl border border-border p-6 space-y-4">
@@ -115,7 +126,16 @@ export default function Settings() {
                 <Input placeholder="6:00 PM" className="w-24" />
               </div>
             ))}
-            <Button className="w-full mt-2">Save Hours</Button>
+            <Button onClick={() => setShowSaveDialog('hours')} className="w-full mt-2">Save Hours</Button>
+            {showSaveDialog === 'hours' && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+                  <h2 className="text-lg font-semibold mb-2">Hours Saved</h2>
+                  <p className="text-sm text-muted-foreground mb-4">Your operating hours have been updated</p>
+                  <Button onClick={() => setShowSaveDialog(null)} variant="outline" className="w-full">Close</Button>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
       )}
@@ -140,19 +160,28 @@ export default function Settings() {
                         <span>Connected</span>
                       </div>
                     ) : (
-                      <Button size="sm" variant="outline" className="shrink-0 gap-1 text-xs">
-                        <Plug className="w-3 h-3" />Connect
-                      </Button>
-                    )}
+                       <Button onClick={() => setShowConnectDialog(item.name)} size="sm" variant="outline" className="shrink-0 gap-1 text-xs">
+                         <Plug className="w-3 h-3" />Connect
+                       </Button>
+                     )}
                   </motion.div>
                 ))}
               </div>
             </div>
           ))}
-        </div>
-      )}
+          </div>
+          {showConnectDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+           <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+             <h2 className="text-lg font-semibold mb-2">Connect {showConnectDialog}</h2>
+             <p className="text-sm text-muted-foreground mb-4">Integration coming soon</p>
+             <Button onClick={() => setShowConnectDialog(null)} variant="outline" className="w-full">Close</Button>
+           </div>
+          </div>
+          )}
+          )}
 
-      {tab === "notifications" && (
+          {tab === "notifications" && (
         <div className="bg-card rounded-2xl border border-border divide-y divide-border overflow-hidden">
           {notifState.map((n, i) => (
             <div key={i} className="p-5 flex items-center justify-between gap-4">

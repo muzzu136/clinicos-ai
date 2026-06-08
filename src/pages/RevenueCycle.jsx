@@ -112,7 +112,7 @@ export default function RevenueCycle() {
                 <div><p className="text-2xl font-heading font-bold text-red-500">5</p><p className="text-xs text-muted-foreground">Errors Found</p></div>
                 <div><p className="text-2xl font-heading font-bold text-amber-600">3</p><p className="text-xs text-muted-foreground">Warnings</p></div>
               </div>
-              <Button className="gap-2"><Zap className="w-4 h-4" /> Auto-Fix All</Button>
+              <Button onClick={() => alert('Applied fixes to all issues')} className="gap-2"><Zap className="w-4 h-4" /> Auto-Fix All</Button>
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="bg-card rounded-2xl border border-border overflow-hidden">
@@ -141,7 +141,7 @@ export default function RevenueCycle() {
                       <p className="text-xs text-emerald-600 font-medium mb-1">Suggested Fix</p>
                       <p className="text-xs font-mono bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">{item.fix}</p>
                     </div>
-                    <Button size="sm" variant="outline" className="shrink-0 text-xs gap-1">
+                    <Button onClick={() => alert(`Applied fix: ${item.fix}`)} size="sm" variant="outline" className="shrink-0 text-xs gap-1">
                       <CheckCircle2 className="w-3 h-3" /> Apply Fix
                     </Button>
                   </motion.div>
@@ -164,7 +164,7 @@ export default function RevenueCycle() {
                   <p className="text-sm text-muted-foreground">Confirm patient coverage & out-of-pocket estimates before the appointment</p>
                 </div>
               </div>
-              <Button className="gap-2"><RefreshCw className="w-4 h-4" /> Verify All Today</Button>
+              <Button onClick={() => alert('Verifying eligibility for all appointments...')} className="gap-2"><RefreshCw className="w-4 h-4" /> Verify All Today</Button>
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="bg-card rounded-2xl border border-border overflow-hidden">
@@ -211,9 +211,9 @@ export default function RevenueCycle() {
                         </td>
                         <td className="p-4">
                           {row.status !== "verified" && (
-                            <Button size="sm" variant="ghost" className="text-primary text-xs gap-1 h-7">
-                              Resolve <ArrowRight className="w-3 h-3" />
-                            </Button>
+                           <Button onClick={() => alert(`Resolving eligibility for ${row.patient}`)} size="sm" variant="ghost" className="text-primary text-xs gap-1 h-7">
+                             Resolve <ArrowRight className="w-3 h-3" />
+                           </Button>
                           )}
                         </td>
                       </tr>
@@ -277,7 +277,7 @@ export default function RevenueCycle() {
                 <p className="text-sm font-semibold text-red-700">2 new denials flagged today</p>
                 <p className="text-xs text-red-600">Emily Davis (CLM-2024-003) and Robert Lee (CLM-2024-006) — appeal window closes in 28 days</p>
               </div>
-              <Button size="sm" className="gap-2 bg-red-600 hover:bg-red-700 text-white shrink-0">
+              <Button onClick={() => alert('Submitting AI appeals for all eligible denials...')} size="sm" className="gap-2 bg-red-600 hover:bg-red-700 text-white shrink-0">
                 <BrainCircuit className="w-4 h-4" /> AI Appeal All Eligible
               </Button>
             </motion.div>
@@ -313,9 +313,9 @@ export default function RevenueCycle() {
                       <p className="text-[10px] text-muted-foreground">{item.recoverable > 0 ? "recoverable" : "non-recoverable"}</p>
                     </div>
                     {item.recoverable > 0 ? (
-                      <Button size="sm" className="gap-1 text-xs shrink-0">
-                        <Zap className="w-3 h-3" /> AI Appeal
-                      </Button>
+                       <Button onClick={() => alert(`Submitting AI appeal for ${item.reason}`)} size="sm" className="gap-1 text-xs shrink-0">
+                         <Zap className="w-3 h-3" /> AI Appeal
+                       </Button>
                     ) : (
                       <Badge className="bg-muted text-muted-foreground text-xs shrink-0">Timely Filing</Badge>
                     )}

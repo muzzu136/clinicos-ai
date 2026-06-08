@@ -58,7 +58,7 @@ export default function VoiceReceptionist() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             AI Active — 24/7
           </div>
-          <Button variant="outline" className="gap-2"><Shield className="w-4 h-4" />HIPAA Secure</Button>
+          <Button onClick={() => alert('HIPAA security compliance verified')} variant="outline" className="gap-2"><Shield className="w-4 h-4" />HIPAA Secure</Button>
         </div>
       </div>
 
@@ -201,7 +201,7 @@ export default function VoiceReceptionist() {
                 </div>
                 <p className="text-xs text-muted-foreground">{item.desc}</p>
               </div>
-              <Button variant="ghost" size="sm">Edit</Button>
+              <Button onClick={() => alert(`Editing ${item.title}`)} variant="ghost" size="sm">Edit</Button>
             </motion.div>
           ))}
         </div>

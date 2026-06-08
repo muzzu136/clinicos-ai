@@ -44,6 +44,8 @@ const sourceData = [
 
 export default function Referrals() {
   const [tab, setTab] = useState("physician");
+  const [showRequestDialog, setShowRequestDialog] = useState(false);
+  const [showCampaignDialog, setShowCampaignDialog] = useState(false);
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
@@ -53,9 +55,27 @@ export default function Referrals() {
           <p className="text-sm text-muted-foreground mt-0.5">Track, automate, and grow your referral network</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2"><Send className="w-4 h-4" />Send Referral Request</Button>
-          <Button className="gap-2"><Gift className="w-4 h-4" />Referral Campaign</Button>
+          <Button onClick={() => setShowRequestDialog(true)} variant="outline" className="gap-2"><Send className="w-4 h-4" />Send Referral Request</Button>
+          <Button onClick={() => setShowCampaignDialog(true)} className="gap-2"><Gift className="w-4 h-4" />Referral Campaign</Button>
         </div>
+        {showRequestDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+              <h2 className="text-lg font-semibold mb-4">Send Referral Request</h2>
+              <p className="text-sm text-muted-foreground mb-4">Referral request tool coming soon</p>
+              <Button onClick={() => setShowRequestDialog(false)} variant="outline" className="w-full">Close</Button>
+            </div>
+          </div>
+        )}
+        {showCampaignDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+              <h2 className="text-lg font-semibold mb-4">Referral Campaign</h2>
+              <p className="text-sm text-muted-foreground mb-4">Campaign builder coming soon</p>
+              <Button onClick={() => setShowCampaignDialog(false)} variant="outline" className="w-full">Close</Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* KPIs */}
@@ -130,7 +150,7 @@ export default function Referrals() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-card rounded-2xl border border-border overflow-hidden">
           <div className="p-5 border-b border-border flex items-center justify-between">
             <h3 className="font-heading font-semibold">Referring Physicians</h3>
-            <Button variant="outline" size="sm" className="gap-2"><Building2 className="w-3.5 h-3.5" />Add Physician</Button>
+            <Button onClick={() => setShowRequestDialog(true)} variant="outline" size="sm" className="gap-2"><Building2 className="w-3.5 h-3.5" />Add Physician</Button>
           </div>
           <table className="w-full text-sm">
             <thead>
@@ -198,7 +218,7 @@ export default function Referrals() {
                     </Badge>
                   </td>
                   <td className="p-4 text-right">
-                    <Button variant="ghost" size="sm">Send Thank You</Button>
+                   <Button onClick={() => setShowRequestDialog(true)} variant="ghost" size="sm">Send Thank You</Button>
                   </td>
                 </tr>
               ))}
