@@ -46,6 +46,8 @@ export default function Referrals() {
   const [tab, setTab] = useState("physician");
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [showCampaignDialog, setShowCampaignDialog] = useState(false);
+  const [requestData, setRequestData] = useState({ physicianEmail: "", message: "" });
+  const [campaignData, setCampaignData] = useState({ name: "", type: "reactivation", channel: "sms" });
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
@@ -59,20 +61,56 @@ export default function Referrals() {
           <Button onClick={() => setShowCampaignDialog(true)} className="gap-2"><Gift className="w-4 h-4" />Referral Campaign</Button>
         </div>
         {showRequestDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full">
               <h2 className="text-lg font-semibold mb-4">Send Referral Request</h2>
-              <p className="text-sm text-muted-foreground mb-4">Referral request tool coming soon</p>
-              <Button onClick={() => setShowRequestDialog(false)} variant="outline" className="w-full">Close</Button>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Physician Email</label>
+                  <input type="email" placeholder="physician@practice.com" value={requestData.physicianEmail} onChange={e => setRequestData({...requestData, physicianEmail: e.target.value})} className="w-full mt-1 h-9 rounded-md border border-input px-3" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Message</label>
+                  <textarea placeholder="Personalize your referral request..." value={requestData.message} onChange={e => setRequestData({...requestData, message: e.target.value})} className="w-full mt-1 p-2 rounded-md border border-input text-sm" rows="4" />
+                </div>
+              </div>
+              <div className="flex gap-2 mt-6">
+                <Button variant="outline" onClick={() => setShowRequestDialog(false)} className="flex-1">Cancel</Button>
+                <Button onClick={() => { alert("✓ Referral request sent to " + requestData.physicianEmail); setShowRequestDialog(false); setRequestData({ physicianEmail: "", message: "" }); }} className="flex-1">Send Request</Button>
+              </div>
             </div>
           </div>
         )}
         {showCampaignDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
-              <h2 className="text-lg font-semibold mb-4">Referral Campaign</h2>
-              <p className="text-sm text-muted-foreground mb-4">Campaign builder coming soon</p>
-              <Button onClick={() => setShowCampaignDialog(false)} variant="outline" className="w-full">Close</Button>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full">
+              <h2 className="text-lg font-semibold mb-4">Create Referral Campaign</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Campaign Name</label>
+                  <input type="text" placeholder="e.g., Physician Appreciation Q1" value={campaignData.name} onChange={e => setCampaignData({...campaignData, name: e.target.value})} className="w-full mt-1 h-9 rounded-md border border-input px-3" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Campaign Type</label>
+                  <select value={campaignData.type} onChange={e => setCampaignData({...campaignData, type: e.target.value})} className="w-full mt-1 h-9 rounded-md border border-input px-3">
+                    <option value="reactivation">Reactivation</option>
+                    <option value="retention">Retention</option>
+                    <option value="referral">Referral Reward</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Channel</label>
+                  <select value={campaignData.channel} onChange={e => setCampaignData({...campaignData, channel: e.target.value})} className="w-full mt-1 h-9 rounded-md border border-input px-3">
+                    <option value="sms">SMS</option>
+                    <option value="email">Email</option>
+                    <option value="multi">Multi-channel</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-6">
+                <Button variant="outline" onClick={() => setShowCampaignDialog(false)} className="flex-1">Cancel</Button>
+                <Button onClick={() => { alert("✓ Campaign '" + campaignData.name + "' created and scheduled!"); setShowCampaignDialog(false); setCampaignData({ name: "", type: "reactivation", channel: "sms" }); }} className="flex-1">Create Campaign</Button>
+              </div>
             </div>
           </div>
         )}

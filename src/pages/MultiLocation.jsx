@@ -12,6 +12,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, LineChart, Line, Legend
 } from "recharts";
+import AddLocationDialog from "@/components/dialogs/AddLocationDialog";
 
 const locations = [
   {
@@ -54,10 +55,29 @@ const benchmarks = [
 export default function MultiLocation() {
   const [tab, setTab] = useState("overview");
   const [selected, setSelected] = useState(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [locationList, setLocationList] = useState(locations);
 
-  const activeLocations = locations.filter(l => l.status === "active");
+  const activeLocations = locationList.filter(l => l.status === "active");
   const totalRevenue = activeLocations.reduce((s, l) => s + l.revenueMTD, 0);
   const totalPatients = activeLocations.reduce((s, l) => s + l.patients, 0);
+
+  const handleAddLocation = (data) => {
+    const newLocation = {
+      id: Math.max(...locationList.map(l => l.id)) + 1,
+      name: data.name,
+      address: `${data.address}, ${data.city} ${data.state} ${data.zip}`,
+      status: "opening_soon",
+      providers: 0,
+      patients: 0,
+      revenueMTD: 0,
+      utilization: 0,
+      rating: 0,
+      noShowRate: 0,
+      collectionRate: 0
+    };
+    setLocationList([...locationList, newLocation]);
+  };
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
@@ -66,7 +86,8 @@ export default function MultiLocation() {
           <h1 className="text-2xl font-heading font-bold">Multi-Location Management</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Enterprise-wide analytics & benchmarking across all locations</p>
         </div>
-        <Button className="gap-2"><Plus className="w-4 h-4" />Add Location</Button>
+        <Button onClick={() => setShowAddDialog(true)} className="gap-2"><Plus className="w-4 h-4" />Add Location</Button>
+        <AddLocationDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} onAdd={handleAddLocation} />
       </div>
 
       {/* Network KPIs */}
@@ -98,7 +119,7 @@ export default function MultiLocation() {
 
       {tab === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {locations.map((loc, i) => (
+          {locationList.map((loc, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
               className={`bg-card rounded-2xl border p-5 cursor-pointer transition-all ${selected === loc.id ? "border-primary ring-1 ring-primary" : "border-border hover:border-primary/30"}`}
               onClick={() => setSelected(selected === loc.id ? null : loc.id)}>

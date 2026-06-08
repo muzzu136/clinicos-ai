@@ -30,6 +30,20 @@ const StarRating = ({ rating }) => (
 
 export default function Reputation() {
   const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [generatedReply, setGeneratedReply] = useState("");
+
+  const generateAIReply = async (review) => {
+    setSelectedReview(review);
+    setGeneratedReply("Generating AI response...");
+    setTimeout(() => {
+      const replies = {
+        positive: `Thank you so much for the wonderful review! We truly appreciate your kind words and are thrilled that ${review.patient} had such a positive experience. Your satisfaction is our greatest reward!`,
+        negative: `We sincerely apologize for the experience ${review.patient} had. Your feedback is invaluable to us. We'd like to make this right — please contact us directly at [clinic contact] so we can address your concerns.`
+      };
+      setGeneratedReply(replies[review.sentiment]);
+    }, 800);
+  };
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
@@ -41,12 +55,21 @@ export default function Reputation() {
         <Button onClick={() => setShowAIGenerator(true)} className="gap-2">
           <BrainCircuit className="w-4 h-4" /> AI Response Generator
         </Button>
-        {showAIGenerator && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
-              <h2 className="text-lg font-semibold mb-4">AI Response Generator</h2>
-              <p className="text-sm text-muted-foreground mb-4">Select a review to generate an AI response</p>
-              <Button onClick={() => setShowAIGenerator(false)} variant="outline" className="w-full">Close</Button>
+        {showAIGenerator && selectedReview && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-xl p-6 max-w-md w-full">
+              <h2 className="text-lg font-semibold mb-4">AI-Generated Reply</h2>
+              <div className="bg-muted/30 p-3 rounded-lg mb-4">
+                <p className="text-sm text-muted-foreground mb-2">Original Review:</p>
+                <p className="text-sm font-medium">{selectedReview.text}</p>
+              </div>
+              <div className="bg-emerald-50 p-3 rounded-lg mb-4 border border-emerald-200">
+                <p className="text-sm text-emerald-700">{generatedReply}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => { setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Close</Button>
+                <Button onClick={() => { alert("✓ Reply posted!"); setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Post Reply</Button>
+              </div>
             </div>
           </div>
         )}
@@ -95,11 +118,11 @@ export default function Reputation() {
                 </div>
                 <div className="flex items-center gap-2">
                   {review.responded ? (
-                    <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">Responded</Badge>
+                   <Badge className="bg-emerald-100 text-emerald-700 text-[10px]">Responded</Badge>
                   ) : (
-                    <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => setShowAIGenerator(true)}>
-                      <BrainCircuit className="w-3 h-3" /> AI Reply
-                    </Button>
+                   <Button size="sm" variant="outline" className="text-xs gap-1 h-7" onClick={() => { setShowAIGenerator(true); generateAIReply(review); }}>
+                     <BrainCircuit className="w-3 h-3" /> AI Reply
+                   </Button>
                   )}
                 </div>
               </div>

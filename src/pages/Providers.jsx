@@ -2,7 +2,12 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star, DollarSign, Users, Calendar, TrendingUp, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, DollarSign, Users, Calendar, TrendingUp, Clock, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import AddProviderDialog from "@/components/dialogs/AddProviderDialog";
+import { useAuth } from "@/lib/AuthContext";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
@@ -21,16 +26,55 @@ const revenueData = providers.map(p => ({
 }));
 
 export default function Providers() {
+  const [providersList, setProvidersList] = useState(providers);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [clinicId, setClinicId] = useState("");
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchClinic = async () => {
+      try {
+        const clinics = await base44.entities.Clinic.filter({ admin_id: user?.id });
+        if (clinics.length > 0) setClinicId(clinics[0].id);
+      } catch (e) {
+        console.error("Failed to fetch clinic:", e);
+      }
+    };
+    if (user?.id) fetchClinic();
+  }, [user?.id]);
+
+  const handleProviderAdded = async () => {
+    try {
+      const updatedProviders = await base44.entities.Provider.filter({ clinic_id: clinicId });
+      setProvidersList(updatedProviders.length > 0 ? updatedProviders : providers);
+    } catch (e) {
+      console.error("Failed to load providers:", e);
+    }
+  };
+
+  const handleDeleteProvider = async (providerId) => {
+    try {
+      await base44.entities.Provider.delete(providerId);
+      setProvidersList(providersList.filter(p => p.id !== providerId));
+    } catch (e) {
+      console.error("Failed to delete provider:", e);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-heading font-bold text-foreground">Provider Intelligence</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">AI-powered provider performance analytics</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-heading font-bold text-foreground">Provider Intelligence</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">AI-powered provider performance analytics</p>
+        </div>
+        <Button onClick={() => setShowAddDialog(true)} className="gap-2"><Plus className="w-4 h-4" />Add Provider</Button>
+        <AddProviderDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} clinicId={clinicId} onSuccess={handleProviderAdded} />
       </div>
 
       {/* Provider Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {providers.map((provider, i) => (
+        {providersList.map((provider, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 12 }}
@@ -85,6 +129,10 @@ export default function Providers() {
                 <Badge className={provider.noShowRate > 5 ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"}>
                   {provider.noShowRate}%
                 </Badge>
+              </div>
+              <div className="flex gap-2 pt-2 border-t border-border">
+                <Button variant="ghost" size="sm" className="flex-1 text-xs">Edit</Button>
+                <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => handleDeleteProvider(provider.id)}><Trash2 className="w-3 h-3" /></Button>
               </div>
             </div>
           </motion.div>

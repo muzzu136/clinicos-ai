@@ -7,7 +7,10 @@ import {
   Plus, UserPlus, TrendingUp, Target, DollarSign,
   Phone, Mail, Globe, ArrowRight
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import AddLeadDialog from "@/components/dialogs/AddLeadDialog";
+import { useAuth } from "@/lib/AuthContext";
 
 const leads = [
   { name: "Jennifer Smith", email: "jen@email.com", phone: "(555) 111-2222", source: "Google Ads", service: "Dental Cleaning", status: "new", score: 85, date: "Nov 22" },
@@ -31,6 +34,30 @@ const sourceIcons = { "Google Ads": Globe, Website: Globe, Referral: UserPlus, F
 
 export default function Leads() {
   const [showNewDialog, setShowNewDialog] = useState(false);
+  const [leadsList, setLeadsList] = useState(leads);
+  const [clinicId, setClinicId] = useState("");
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchClinic = async () => {
+      try {
+        const clinics = await base44.entities.Clinic.filter({ admin_id: user?.id });
+        if (clinics.length > 0) setClinicId(clinics[0].id);
+      } catch (e) {
+        console.error("Failed to fetch clinic:", e);
+      }
+    };
+    if (user?.id) fetchClinic();
+  }, [user?.id]);
+
+  const handleLeadAdded = async () => {
+    try {
+      const updatedLeads = await base44.entities.Lead.filter({ clinic_id: clinicId });
+      setLeadsList(updatedLeads.length > 0 ? updatedLeads : leads);
+    } catch (e) {
+      console.error("Failed to load leads:", e);
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
@@ -40,15 +67,7 @@ export default function Leads() {
           <p className="text-sm text-muted-foreground mt-0.5">Patient acquisition CRM & conversion tracking</p>
         </div>
         <Button onClick={() => setShowNewDialog(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Lead</Button>
-        {showNewDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-card rounded-xl p-6 max-w-md w-full mx-4">
-              <h2 className="text-lg font-semibold mb-4">Add Lead</h2>
-              <p className="text-sm text-muted-foreground mb-4">Lead form coming soon</p>
-              <Button onClick={() => setShowNewDialog(false)} variant="outline" className="w-full">Close</Button>
-            </div>
-          </div>
-        )}
+        <AddLeadDialog open={showNewDialog} onClose={() => setShowNewDialog(false)} clinicId={clinicId} onSuccess={handleLeadAdded} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -71,7 +90,7 @@ export default function Leads() {
       {/* Pipeline */}
       <div className="grid grid-cols-5 gap-3">
         {["new", "contacted", "qualified", "appointment_set", "converted"].map(stage => {
-          const stageLeads = leads.filter(l => l.status === stage);
+          const stageLeads = leadsList.filter(l => l.status === stage);
           const config = statusConfig[stage];
           return (
             <div key={stage} className="bg-card rounded-xl border border-border p-3">
