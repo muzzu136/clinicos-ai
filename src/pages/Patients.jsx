@@ -11,6 +11,7 @@ import {
 import { Search, Plus, AlertTriangle, UserCheck, UserX, Users, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useClinic } from "@/components/ClinicContext";
+import AddPatientDialog from "@/components/patients/AddPatientDialog";
 
 const statusConfig = {
   active: { label: "Active", color: "bg-emerald-100 text-emerald-700" },
@@ -26,21 +27,23 @@ export default function Patients() {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const fetchPatients = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId });
+      const raw = res.data;
+      const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.patients) ? raw.patients : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
+      setPatients(list);
+    } catch (e) {
+      setError(e.message);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId });
-        const raw = res.data;
-        const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.patients) ? raw.patients : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
-        setPatients(list);
-      } catch (e) {
-        setError(e.message);
-      }
-      setLoading(false);
-    };
     if (clinicId) {
       fetchPatients();
     }
@@ -64,7 +67,7 @@ export default function Patients() {
           <h1 className="text-2xl font-heading font-bold text-foreground">Patients</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Manage your patient database & retention</p>
         </div>
-        <Button className="gap-2"><Plus className="w-4 h-4" /> Add Patient</Button>
+        <Button onClick={() => setDialogOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Patient</Button>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
@@ -164,6 +167,16 @@ export default function Patients() {
           </Table>
         )}
       </motion.div>
+
+      <AddPatientDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+        clinicId={clinicId}
+        onPatientAdded={() => {
+          setLoading(true);
+          fetchPatients();
+        }}
+      />
     </div>
   );
 }
