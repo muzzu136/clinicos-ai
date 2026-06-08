@@ -180,7 +180,6 @@ export default function Settings() {
             </div>
           ))}
         </div>
-        </div>
         <IntegrationConnectDialog 
           open={!!showConnectDialog} 
           integration={showConnectDialog} 
