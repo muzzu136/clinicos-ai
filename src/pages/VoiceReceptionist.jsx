@@ -52,6 +52,24 @@ export default function VoiceReceptionist() {
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
+      {/* Add-on banner */}
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+            <span className="text-amber-600 font-bold text-xs">ADD-ON</span>
+          </div>
+          <div>
+            <p className="font-semibold text-amber-900 text-sm">AI Voice Receptionist is a paid add-on</p>
+            <p className="text-xs text-amber-700">Starts at $199/mo · Only pay for what you use · Cancel anytime</p>
+          </div>
+        </div>
+        <a href="mailto:sales@clinicosai.org?subject=Voice Receptionist Add-On" className="shrink-0">
+          <button className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+            Activate Add-On
+          </button>
+        </a>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-heading font-bold">AI Voice Receptionist</h1>

@@ -18,53 +18,67 @@ import {
 const plans = [
   {
     name: "Starter",
-    price: 299,
+    price: 149,
     badge: null,
     highlight: false,
     description: "Perfect for solo providers just getting started",
     features: [
-      "1 Provider", "Core Scheduling", "Basic RCM Dashboard",
-      "Patient Records", "Email Support", "Monthly Reports"
+      "1 Provider",
+      "Patients & Appointments",
+      "Claims Management",
+      "AI Dashboard & Insights",
+      "Email Support",
     ],
-    missing: ["AI Campaigns", "AI Voice Receptionist", "Multi-Location", "Predictive Analytics"]
+    missing: ["Full RCM & Claim Intelligence", "AI Campaigns & Retention", "AI Copilot", "Referrals & Leads"]
   },
   {
     name: "Growth",
-    price: 699,
-    badge: "Popular",
-    highlight: false,
-    description: "Ideal for growing practices with 2–3 providers",
+    price: 399,
+    badge: "Most Popular",
+    highlight: true,
+    description: "The full suite for growing practices ready to scale.",
     features: [
-      "Up to 3 Providers", "AI Campaigns & Retention", "Reputation Management",
-      "Call Intelligence", "Lead CRM", "Priority Email Support"
+      "Up to 3 Providers",
+      "Full RCM + Claim Intelligence",
+      "Denial Auto-Appeals",
+      "AI Copilot & Consultant",
+      "Campaigns, Leads & Referrals",
+      "Reputation Management",
+      "Priority Email & Chat Support",
     ],
-    missing: ["AI Voice Receptionist", "Multi-Location", "Full RCM Suite"]
+    missing: ["8+ Providers", "Multi-Location", "White Label"]
   },
   {
     name: "Professional",
-    price: 1499,
+    price: 799,
     badge: "Best Value",
-    highlight: true,
-    description: "The complete AI operating system for established practices",
+    highlight: false,
+    description: "The complete AI operating system for established practices.",
     features: [
-      "Up to 6 Providers", "Full RCM Suite + Scrubber",
-      "Real-Time Eligibility", "Denial Auto-Appeals",
-      "Predictive Analytics", "AI Copilot", "AI Business Consultant",
-      "Staff Productivity", "Phone & Chat Support"
+      "Up to 8 Providers",
+      "Everything in Growth",
+      "Financial Intelligence & Forecasting",
+      "Billing Automation",
+      "Real-Time Eligibility Checks",
+      "Staff & Operational Analytics",
+      "Phone & Chat Support",
     ],
     missing: ["Multi-Location (Add-On)", "White Label"]
   },
   {
     name: "Enterprise",
-    price: 2999,
+    price: null,
     badge: null,
     highlight: false,
-    description: "Unlimited scale for large groups & health systems",
+    description: "Unlimited scale for large groups & health systems.",
     features: [
-      "Unlimited Providers", "Multi-Location (Included)",
-      "White Label Branding", "Dedicated CSM",
-      "Custom Integrations", "SLA Guarantee",
-      "Annual Business Review", "All Pro Features"
+      "Unlimited Providers",
+      "Multi-Location (Included)",
+      "White Label Branding",
+      "Dedicated Account Manager",
+      "Custom EHR Integrations",
+      "SLA Guarantee (99.9%)",
+      "All Professional Features",
     ],
     missing: []
   },
@@ -232,7 +246,7 @@ export default function Subscription() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {plans.map((plan, i) => {
-            const price = billing === "annual" ? Math.round(plan.price * 0.85) : plan.price;
+            const price = billing === "annual" ? Math.round(plan.price * 0.80) : plan.price;
             const isCurrent = plan.name === currentPlan;
             return (
               <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}

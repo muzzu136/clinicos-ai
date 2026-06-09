@@ -93,6 +93,23 @@ export default function MultiLocation() {
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
+      {/* Enterprise-only banner */}
+      <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+            <span className="text-violet-600 font-bold text-xs">ENT</span>
+          </div>
+          <div>
+            <p className="font-semibold text-violet-900 text-sm">Multi-Location is an Enterprise feature</p>
+            <p className="text-xs text-violet-700">Included on Enterprise plan · Also available as $499/mo per location add-on</p>
+          </div>
+        </div>
+        <a href="mailto:sales@clinicosai.org?subject=Enterprise Plan" className="shrink-0">
+          <button className="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+            Upgrade to Enterprise
+          </button>
+        </a>
+      </div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-heading font-bold">Multi-Location Management</h1>

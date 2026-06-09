@@ -2,42 +2,52 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Calendar, Users, DollarSign, TrendingUp,
-  Star, MessageSquare, Phone, BarChart3, Bot,
-  FileText, UserPlus, Building2, ChevronLeft, ChevronRight,
-  Activity, BrainCircuit, Mic, GitBranch, Eye, MapPin,
-  LineChart, Briefcase, Settings, Award, BookOpen, CreditCard, ShieldAlert
+  Star, MessageSquare, BarChart3, Bot,
+  FileText, UserPlus, GitBranch, MapPin,
+  BrainCircuit, Mic, Settings, BookOpen, CreditCard,
+  ShieldAlert, Activity, X, ChevronLeft, ChevronRight, Lock
 } from "lucide-react";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+
+// Badge for plan-gated items
+const PlanBadge = ({ plan }) => (
+  <span className={cn(
+    "ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0",
+    plan === "Growth" && "bg-emerald-500/20 text-emerald-400",
+    plan === "Professional" && "bg-violet-500/20 text-violet-400",
+    plan === "Enterprise" && "bg-amber-500/20 text-amber-400",
+  )}>
+    {plan}
+  </span>
+);
 
 const navGroups = [
   {
     label: "Command Center",
     items: [
-      { label: "Dashboard", icon: LayoutDashboard, path: "/" },
-      { label: "AI Copilot", icon: BrainCircuit, path: "/copilot" },
-      { label: "AI Consultant", icon: Briefcase, path: "/business-consultant" },
+      { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { label: "AI Command Center", icon: BrainCircuit, path: "/copilot" },
     ]
   },
   {
     label: "Operations",
     items: [
-      { label: "Voice Receptionist", icon: Mic, path: "/voice-receptionist" },
-      { label: "Appointments", icon: Calendar, path: "/appointments" },
       { label: "Patients", icon: Users, path: "/patients" },
+      { label: "Appointments", icon: Calendar, path: "/appointments" },
       { label: "Providers", icon: Activity, path: "/providers" },
-      { label: "Staff Productivity", icon: Award, path: "/staff-productivity" },
+      { label: "Messages", icon: MessageSquare, path: "/messages" },
+      { label: "Voice Receptionist", icon: Mic, path: "/voice-receptionist", plan: "Add-on" },
     ]
   },
   {
     label: "Revenue",
     items: [
-      { label: "Revenue Cycle", icon: DollarSign, path: "/revenue-cycle" },
       { label: "Claims", icon: FileText, path: "/claims" },
       { label: "Claim Intelligence", icon: ShieldAlert, path: "/claim-intelligence" },
-      { label: "Billing Report", icon: DollarSign, path: "/billing-report" },
+      { label: "Revenue Cycle", icon: DollarSign, path: "/revenue-cycle" },
       { label: "Financial Intel", icon: BarChart3, path: "/financials" },
-      { label: "Predictive Analytics", icon: LineChart, path: "/predictive-analytics" },
+      { label: "Billing Report", icon: DollarSign, path: "/billing-report" },
     ]
   },
   {
@@ -47,20 +57,12 @@ const navGroups = [
       { label: "Reputation", icon: Star, path: "/reputation" },
       { label: "Leads", icon: UserPlus, path: "/leads" },
       { label: "Referrals", icon: GitBranch, path: "/referrals" },
-      { label: "Competitor Intel", icon: Eye, path: "/competitor-intelligence" },
     ]
   },
   {
-    label: "Communication",
+    label: "Account",
     items: [
-      { label: "Messages", icon: MessageSquare, path: "/messages" },
-      { label: "Call Intel", icon: Phone, path: "/call-intelligence" },
-    ]
-  },
-  {
-    label: "Enterprise",
-    items: [
-      { label: "Multi-Location", icon: MapPin, path: "/multi-location" },
+      { label: "Multi-Location", icon: MapPin, path: "/multi-location", plan: "Enterprise" },
       { label: "Plan & Billing", icon: CreditCard, path: "/subscription" },
       { label: "Settings", icon: Settings, path: "/settings" },
       { label: "Training Center", icon: BookOpen, path: "/training" },
@@ -75,9 +77,7 @@ export default function Sidebar({ open = false, onClose }) {
   return (
     <aside className={cn(
       "fixed left-0 top-0 h-screen bg-sidebar text-sidebar-foreground flex flex-col z-50 transition-all duration-300 border-r border-sidebar-border",
-      // Desktop: always visible, collapsible
       collapsed ? "lg:w-[72px]" : "lg:w-[260px]",
-      // Mobile: slide in/out
       "w-[260px]",
       open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
     )}>
@@ -94,7 +94,6 @@ export default function Sidebar({ open = false, onClose }) {
             </div>
           )}
         </div>
-        {/* Mobile close button */}
         {onClose && (
           <button onClick={onClose} className="lg:hidden p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
             <X className="w-4 h-4" />
@@ -119,6 +118,7 @@ export default function Sidebar({ open = false, onClose }) {
                     key={item.path}
                     to={item.path}
                     onClick={onClose}
+                    title={collapsed ? item.label : undefined}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                       isActive
@@ -127,7 +127,12 @@ export default function Sidebar({ open = false, onClose }) {
                     )}
                   >
                     <item.icon className={cn("w-[18px] h-[18px] shrink-0", isActive && "drop-shadow-sm")} />
-                    {!collapsed && <span>{item.label}</span>}
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1">{item.label}</span>
+                        {item.plan && <PlanBadge plan={item.plan} />}
+                      </>
+                    )}
                   </Link>
                 );
               })}
@@ -136,8 +141,8 @@ export default function Sidebar({ open = false, onClose }) {
         ))}
       </nav>
 
-      {/* Collapse Toggle */}
-      <div className="p-3 border-t border-sidebar-border shrink-0">
+      {/* Collapse Toggle (desktop only) */}
+      <div className="hidden lg:block p-3 border-t border-sidebar-border shrink-0">
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors text-sm"

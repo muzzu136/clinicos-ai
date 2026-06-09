@@ -12,6 +12,9 @@ import {
   PieChart as PieIcon, BrainCircuit, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
+import { LineChart, Line, ReferenceLine } from "recharts";
 
 const revenueByService = [
   { service: "Office Visits", revenue: 89400, color: "hsl(217, 91%, 60%)" },
@@ -39,6 +42,7 @@ const forecasts = [
 
 export default function Financials() {
   const { clinicId } = useClinic();
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Attempt to load real data; falls back to sample data if unavailable
   useEffect(() => {
@@ -59,15 +63,22 @@ export default function Financials() {
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-heading font-bold text-foreground">Financial Intelligence</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">AI-powered revenue analytics & forecasting</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Revenue analytics, forecasting & predictive insights</p>
         </div>
         <Button variant="outline" className="gap-2">
           <BrainCircuit className="w-4 h-4" /> AI Financial Report
         </Button>
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="predictive">Predictive Forecast</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

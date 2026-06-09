@@ -32,23 +32,30 @@ const FEATURES = [
 
 const PLANS = [
   {
-    name: "Starter", price: 299, period: "/mo",
-    description: "Perfect for single-provider clinics getting started.",
-    features: ["Up to 500 patients", "AI scheduling & reminders", "Claims processing", "Basic reporting", "Email support"],
-    missing: ["AI Voice Receptionist", "Claim Intelligence", "Predictive Analytics"],
+    name: "Starter", price: 149, period: "/mo",
+    description: "Perfect for solo providers just getting started.",
+    features: ["1 provider", "Patients & appointments", "Claims management", "AI dashboard & insights", "Email support"],
+    missing: ["Full RCM & Claim Intelligence", "AI Copilot", "Campaigns & leads"],
     cta: "Start Free Trial", highlight: false,
   },
   {
-    name: "Professional", price: 1499, period: "/mo",
-    description: "The full ClinicOS AI suite for growing practices.",
-    features: ["Up to 6 providers", "Full Revenue Cycle AI", "Claim Intelligence", "AI Copilot", "Predictive Analytics", "Omnichannel messaging", "Priority support"],
-    missing: ["Multi-location", "White label"],
+    name: "Growth", price: 399, period: "/mo",
+    description: "The full suite for growing practices ready to scale.",
+    features: ["Up to 3 providers", "Full RCM + Claim Intelligence", "Denial auto-appeals", "AI Copilot & Consultant", "Campaigns, leads & referrals", "Reputation management", "Priority support"],
+    missing: ["8+ providers", "Multi-location", "White label"],
     cta: "Start Free Trial", highlight: true, badge: "Most Popular",
   },
   {
+    name: "Professional", price: 799, period: "/mo",
+    description: "Complete AI OS for established practices.",
+    features: ["Up to 8 providers", "Everything in Growth", "Financial forecasting", "Billing automation", "Real-time eligibility", "Phone & chat support"],
+    missing: ["Multi-location (add-on)", "White label"],
+    cta: "Start Free Trial", highlight: false,
+  },
+  {
     name: "Enterprise", price: null, period: "custom",
-    description: "For large health systems and multi-location networks.",
-    features: ["Unlimited providers & locations", "Custom EHR integrations", "AI Voice Receptionist included", "White label option", "Dedicated CSM", "SLA guarantees", "Phone support"],
+    description: "Unlimited scale for large groups & health systems.",
+    features: ["Unlimited providers", "Multi-location included", "White label branding", "Dedicated CSM", "Custom integrations", "SLA guarantees"],
     missing: [],
     cta: "Contact Sales", highlight: false,
   },
@@ -301,7 +308,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 items-stretch">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
             {PLANS.map((plan, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className={`relative flex flex-col rounded-2xl p-8 border-2 transition-shadow ${plan.highlight ? "border-blue-600 bg-white shadow-xl shadow-blue-100" : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"}`}>

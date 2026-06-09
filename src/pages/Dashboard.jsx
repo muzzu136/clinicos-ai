@@ -100,8 +100,12 @@ export default function Dashboard() {
 
       {/* Recovery Widget */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <RecoveryRevenueWidget />
+        <div className="lg:col-span-1">
+          <RecoveryRevenueWidget />
+        </div>
       </div>
+
+
     </div>
   );
 }

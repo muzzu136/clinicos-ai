@@ -24,21 +24,14 @@ import Reputation from '@/pages/Reputation';
 import Leads from '@/pages/Leads';
 import Providers from '@/pages/Providers';
 import Messages from '@/pages/Messages';
-import CallIntelligence from '@/pages/CallIntelligence';
 import AICopilot from '@/pages/AICopilot';
-import StaffProductivity from '@/pages/StaffProductivity';
 import Referrals from '@/pages/Referrals';
-import CompetitorIntelligence from '@/pages/CompetitorIntelligence';
 import MultiLocation from '@/pages/MultiLocation';
-import PredictiveAnalytics from '@/pages/PredictiveAnalytics';
-import BusinessConsultant from '@/pages/BusinessConsultant';
 import Settings from '@/pages/Settings';
 import VoiceReceptionist from '@/pages/VoiceReceptionist';
 import Training from '@/pages/Training';
 import Subscription from '@/pages/Subscription';
 import BillingReport from '@/pages/BillingReport';
-import CustomerDashboard from '@/pages/CustomerDashboard';
-import CustomerPatients from '@/pages/CustomerPatients';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
 import ClinicOnboarding from '@/pages/ClinicOnboarding';
 import LandingPage from '@/pages/LandingPage';
@@ -72,8 +65,6 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<ClinicProvider><AppLayout /></ClinicProvider>}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
-          <Route path="/customer/patients" element={<CustomerPatients />} />
           <Route path="/patients" element={<Patients />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/revenue-cycle" element={<RevenueCycle />} />
@@ -85,14 +76,9 @@ const AuthenticatedApp = () => {
           <Route path="/leads" element={<Leads />} />
           <Route path="/providers" element={<Providers />} />
           <Route path="/messages" element={<Messages />} />
-          <Route path="/call-intelligence" element={<CallIntelligence />} />
           <Route path="/copilot" element={<AICopilot />} />
-          <Route path="/staff-productivity" element={<StaffProductivity />} />
           <Route path="/referrals" element={<Referrals />} />
-          <Route path="/competitor-intelligence" element={<CompetitorIntelligence />} />
           <Route path="/multi-location" element={<MultiLocation />} />
-          <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
-          <Route path="/business-consultant" element={<BusinessConsultant />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/voice-receptionist" element={<VoiceReceptionist />} />
           <Route path="/training" element={<Training />} />
