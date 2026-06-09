@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from "@/components/ui/table";
@@ -22,6 +24,7 @@ const claimStatusConfig = {
 };
 
 export default function BillingReport() {
+  const { clinicId } = useClinic();
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -31,7 +34,7 @@ export default function BillingReport() {
     const fetchClaims = async () => {
       setLoading(true);
       try {
-        const res = await base44.functions.invoke("awsClaims", { action: "list" });
+        const res = await base44.functions.invoke("awsClaims", { action: "list", clinic_id: clinicId });
         const raw = res.data;
         const list = Array.isArray(raw) ? raw
           : Array.isArray(raw?.claims) ? raw.claims
@@ -39,7 +42,7 @@ export default function BillingReport() {
           : Array.isArray(raw?.items) ? raw.items : [];
         setClaims(list);
       } catch (e) {
-        console.error(e);
+        toast.error(e?.message || "An error occurred. Please try again.");
       }
       setLoading(false);
     };

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Clock, User, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 
 const statusConfig = {
   checked_in: { label: "Checked In", color: "bg-emerald-100 text-emerald-700" },
@@ -16,6 +17,7 @@ const statusConfig = {
 };
 
 export default function TodaySchedule() {
+  const { clinicId } = useClinic();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,7 @@ export default function TodaySchedule() {
     const fetch = async () => {
       setLoading(true);
       try {
-        const res = await base44.functions.invoke("awsAppointments", { action: "list" });
+        const res = await base44.functions.invoke("awsAppointments", { action: "list", clinic_id: clinicId });
         const raw = res.data;
         const all = Array.isArray(raw) ? raw
           : Array.isArray(raw?.appointments) ? raw.appointments

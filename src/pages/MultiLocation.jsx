@@ -82,21 +82,13 @@ export default function MultiLocation() {
   const totalRevenue = activeLocations.reduce((s, l) => s + l.revenueMTD, 0);
   const totalPatients = activeLocations.reduce((s, l) => s + l.patients, 0);
 
-  const handleAddLocation = (data) => {
-    const newLocation = {
-      id: Math.max(...locationList.map(l => l.id)) + 1,
-      name: data.name,
-      address: `${data.address}, ${data.city} ${data.state} ${data.zip}`,
-      status: "opening_soon",
-      providers: 0,
-      patients: 0,
-      revenueMTD: 0,
-      utilization: 0,
-      rating: 0,
-      noShowRate: 0,
-      collectionRate: 0
-    };
-    setLocationList([...locationList, newLocation]);
+  const handleAddLocation = async () => {
+    // Reload locations from DB after save (AddLocationDialog now saves to DB directly)
+    try {
+      const res = await base44.functions.invoke("awsLocations", { action: "list", clinic_id: clinicId });
+      const list = res?.data;
+      if (Array.isArray(list) && list.length > 0) setLocationList(list);
+    } catch { /* keep existing list */ }
   };
 
   return (

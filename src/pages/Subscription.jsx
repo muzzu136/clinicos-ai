@@ -118,6 +118,38 @@ const recoveryData = [
 
 export default function Subscription() {
   const { clinicId } = useClinic();
+  const [switchingPlan, setSwitchingPlan] = useState(null);
+  const [addingAddon, setAddingAddon] = useState(null);
+
+  const handleSwitchPlan = async (planName) => {
+    setSwitchingPlan(planName);
+    try {
+      await base44.functions.invoke("awsSubscription", {
+        action: "switch_plan",
+        clinic_id: clinicId,
+        plan_name: planName,
+        billing_cycle: billing,
+      });
+      toast.success(`Switched to ${planName} plan. Your billing will be updated.`);
+    } catch (e) {
+      toast.error("Plan switch failed: " + (e.message || "Please contact support."));
+    } finally { setSwitchingPlan(null); }
+  };
+
+  const handleAddAddon = async (addonName) => {
+    setAddingAddon(addonName);
+    try {
+      await base44.functions.invoke("awsSubscription", {
+        action: "add_addon",
+        clinic_id: clinicId,
+        addon_name: addonName,
+      });
+      toast.success(`${addonName} add-on activated. Our team will be in touch to set it up.`);
+    } catch (e) {
+      toast.error("Failed to add addon: " + (e.message || "Please contact support."));
+    } finally { setAddingAddon(null); }
+  };
+  const { clinicId } = useClinic();
   const [billing, setBilling] = useState("monthly");
   const currentPlan = "Professional";
   const totalRecovered = recoveryData.reduce((s, d) => s + d.recovered, 0);
@@ -236,8 +268,14 @@ export default function Subscription() {
                     </div>
                   ))}
                 </div>
-                <Button className="w-full" variant={isCurrent ? "outline" : "default"} disabled={isCurrent}>
-                  {isCurrent ? "Current Plan" : `Switch to ${plan.name}`}
+                <Button
+                  className="w-full gap-2"
+                  variant={isCurrent ? "outline" : "default"}
+                  disabled={isCurrent || switchingPlan === plan.name}
+                  onClick={() => !isCurrent && handleSwitchPlan(plan.name)}
+                >
+                  {switchingPlan === plan.name && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {isCurrent ? "Current Plan" : switchingPlan === plan.name ? "Switching..." : `Switch to ${plan.name}`}
                 </Button>
               </motion.div>
             );
@@ -270,8 +308,15 @@ export default function Subscription() {
                 {addon.example && (
                   <p className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg px-3 py-2">{addon.example}</p>
                 )}
-                <Button size="sm" variant="outline" className="gap-2">
-                  Add to Plan <ArrowRight className="w-3 h-3" />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                  disabled={addingAddon === addon.name}
+                  onClick={() => handleAddAddon(addon.name)}
+                >
+                  {addingAddon === addon.name ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
+                  {addingAddon === addon.name ? "Processing..." : "Add to Plan"}
                 </Button>
               </motion.div>
             );

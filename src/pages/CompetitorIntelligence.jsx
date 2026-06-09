@@ -94,10 +94,16 @@ export default function CompetitorIntelligence() {
 
   const handleRefreshAnalysis = async () => {
     setLoading(true);
-    setTimeout(() => {
-      toast.success("Competitor analysis refreshed. Nearby competitors analyzed.");
+    try {
+      await base44.integrations.Core.InvokeLLM({
+        prompt: "You are a healthcare market analyst. Summarize the competitive landscape for a multi-specialty clinic. Provide 3 key differentiators and 2 market opportunities. Keep it brief.",
+      });
+      toast.success("Competitor analysis refreshed.");
+    } catch (e) {
+      toast.error("Analysis failed: " + (e.message || "Try again."));
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (

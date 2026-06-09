@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ export default function CustomerPatients() {
         setPatients(list);
       } catch (e) {
         console.error("Failed to load patients:", e);
+      toast.error("Failed to load patients:");
       } finally {
         setLoading(false);
       }

@@ -72,7 +72,7 @@ export default function Financials() {
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Revenue (MTD)", value: "$242,800", change: 12.4, icon: DollarSign, color: "bg-emerald-50 text-emerald-600" },
+          { label: "Total Revenue (MTD)", value: "See Billing Report", change: null, icon: DollarSign, color: "bg-emerald-50 text-emerald-600" },
           { label: "Net Profit Margin", value: "32.8%", change: 2.1, icon: TrendingUp, color: "bg-primary/10 text-primary" },
           { label: "Revenue Per Provider", value: "$60,700", change: 8.5, icon: BarChart3, color: "bg-violet-50 text-violet-600" },
           { label: "Revenue Per Visit", value: "$178", change: 5.3, icon: PieIcon, color: "bg-amber-50 text-amber-600" },

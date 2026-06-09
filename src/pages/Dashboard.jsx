@@ -11,6 +11,7 @@ import {
   DollarSign, Users, Calendar, TrendingUp,
   FileText, Phone, Star, UserPlus
 } from "lucide-react";
+import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 
 export default function Dashboard() {
@@ -57,6 +58,7 @@ export default function Dashboard() {
         ]);
       } catch (e) {
         console.error("Failed to load dashboard data:", e);
+      toast.error("Failed to load dashboard data:");
       }
     };
 

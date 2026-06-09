@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 import {
   Briefcase, TrendingUp, DollarSign, Users, Zap,
   CheckCircle2, AlertTriangle, Download, RefreshCw, Lightbulb
@@ -83,6 +84,7 @@ const categoryColors = {
 };
 
 export default function BusinessConsultant() {
+  const { clinicId } = useClinic();
   const [tab, setTab] = useState("recommendations");
   const [loading, setLoading] = useState(false);
   const [executiveReport, setExecutiveReport] = useState(null);
@@ -90,22 +92,41 @@ export default function BusinessConsultant() {
   const generateReport = async () => {
     setLoading(true);
     try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an AI Business Consultant for a healthcare clinic. Generate a concise weekly executive summary report based on these metrics:
-        
-- Monthly Revenue: $242,800 (+12.4% vs last month)
-- Active Patients: 2,847
-- Collection Rate: 94.2%
-- Schedule Utilization: 87%
-- No-Show Rate: 4.2%
-- Denied Claims: 12 (total $18,400)
-- New Patients This Month: 64
-- Avg Rating: 4.8★
+      // Fetch real clinic metrics
+      const [patientsRes, claimsRes, apptRes] = await Promise.allSettled([
+        base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId }),
+        base44.functions.invoke("awsClaims", { action: "list", clinic_id: clinicId }),
+        base44.functions.invoke("awsAppointments", { action: "list", clinic_id: clinicId }),
+      ]);
+      const patients = patientsRes.status === "fulfilled" ? (Array.isArray(patientsRes.value.data) ? patientsRes.value.data : patientsRes.value.data?.patients || []) : [];
+      const claims = claimsRes.status === "fulfilled" ? (Array.isArray(claimsRes.value.data) ? claimsRes.value.data : claimsRes.value.data?.claims || []) : [];
+      const appts = apptRes.status === "fulfilled" ? (Array.isArray(apptRes.value.data) ? apptRes.value.data : apptRes.value.data?.appointments || []) : [];
 
-Provide: 1) Key wins this week, 2) Top 3 risks, 3) Top 3 revenue opportunities, 4) One strategic recommendation for next 30 days.
-Keep it executive-level, concise, and action-oriented.`,
+      const activePatients = patients.filter(p => p.status === "active").length;
+      const totalRevenue = patients.reduce((s, p) => s + (p.total_revenue || 0), 0);
+      const deniedClaims = claims.filter(c => c.status === "denied");
+      const paidClaims = claims.filter(c => c.status === "paid").length;
+      const collectionRate = claims.length > 0 ? Math.round((paidClaims / claims.length) * 100) : 0;
+      const noShows = appts.filter(a => a.status === "no_show").length;
+      const noShowRate = appts.length > 0 ? Math.round((noShows / appts.length) * 100) : 0;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an AI Business Consultant for a healthcare clinic. Generate a concise executive summary report based on these REAL metrics:
+
+- Total Patients: ${patients.length} (${activePatients} active)
+- Monthly Revenue: $${totalRevenue.toLocaleString()}
+- Collection Rate: ${collectionRate}%
+- No-Show Rate: ${noShowRate}%
+- Denied Claims: ${deniedClaims.length} (total $${deniedClaims.reduce((s,c) => s+(Number(c.amount_billed)||0), 0).toLocaleString()})
+- Total Claims: ${claims.length}
+- Appointments: ${appts.length} total
+
+Provide: 1) Key wins, 2) Top 3 risks, 3) Top 3 revenue opportunities, 4) One strategic recommendation for next 30 days.
+Keep it executive-level, concise, and action-oriented. Use markdown formatting.`,
       });
       setExecutiveReport(result);
+    } catch (e) {
+      setExecutiveReport("Report generation failed: " + (e.message || "Please try again."));
     } finally {
       setLoading(false);
     }

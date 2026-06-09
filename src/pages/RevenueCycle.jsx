@@ -131,7 +131,7 @@ export default function RevenueCycle() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: "Total A/R", value: "$252,600", icon: DollarSign, color: "bg-primary/10 text-primary" },
-          { label: "Collection Rate", value: "94.2%", icon: TrendingUp, color: "bg-emerald-50 text-emerald-600" },
+          { label: "Collection Rate", value: collectionRate, icon: TrendingUp, color: "bg-emerald-50 text-emerald-600" },
           { label: "Denied Claims", value: "31", icon: XCircle, color: "bg-red-50 text-red-500" },
           { label: "Avg Days to Pay", value: "21", icon: Clock, color: "bg-amber-50 text-amber-600" },
           { label: "Recoverable", value: "$38,300", icon: BrainCircuit, color: "bg-violet-50 text-violet-600" },

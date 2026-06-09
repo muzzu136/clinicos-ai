@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, FileText, DollarSign, CheckCircle2, XCircle, Clock, AlertTriangle, BrainCircuit, ArrowRight, Loader2 } from "lucide-react";
+import { Search, Plus, BrainCircuit, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useClinic } from "@/components/ClinicContext";
 import { toast } from "sonner";
@@ -21,6 +24,11 @@ const statusConfig = {
   appealed: { label: "Appealed", color: "bg-violet-100 text-violet-700" },
 };
 
+const defaultClaimForm = {
+  patient_name: "", payer_name: "", cpt_codes: "", icd_codes: "",
+  amount_billed: "", service_date: "", provider_name: "", status: "submitted",
+};
+
 export default function Claims() {
   const { clinicId, loading: clinicLoading } = useClinic();
   const [tab, setTab] = useState("all");
@@ -28,24 +36,98 @@ export default function Claims() {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [newClaimOpen, setNewClaimOpen] = useState(false);
+  const [claimForm, setClaimForm] = useState(defaultClaimForm);
+  const [claimSaving, setClaimSaving] = useState(false);
+  const [claimError, setClaimError] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [aiResult, setAiResult] = useState("");
+  const [aiOpen, setAiOpen] = useState(false);
+
+  const fetchClaims = useCallback(async () => {
+    if (!clinicId) { setLoading(false); return; }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await base44.functions.invoke("awsClaims", { action: "list", clinic_id: clinicId });
+      const raw = res.data;
+      const list = Array.isArray(raw) ? raw
+        : Array.isArray(raw?.claims) ? raw.claims
+        : Array.isArray(raw?.data) ? raw.data
+        : Array.isArray(raw?.items) ? raw.items : [];
+      setClaims(list);
+    } catch (e) {
+      setError(e.message);
+    }
+    setLoading(false);
+  }, [clinicId]);
 
   useEffect(() => {
-    const fetchClaims = async () => {
-      if (!clinicId) { setLoading(false); return; }
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await base44.functions.invoke("awsClaims", { action: "list", clinic_id: clinicId });
-        const raw = res.data;
-        const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.claims) ? raw.claims : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
-        setClaims(list);
-      } catch (e) {
-        setError(e.message);
-      }
-      setLoading(false);
-    };
-    fetchClaims();
-  }, []);
+    if (!clinicLoading) fetchClaims();
+  }, [clinicId, clinicLoading, fetchClaims]);
+
+  const handleNewClaimSubmit = async (e) => {
+    e.preventDefault();
+    if (!claimForm.patient_name || !claimForm.payer_name || !claimForm.amount_billed || !claimForm.service_date) {
+      setClaimError("Patient name, payer, amount, and service date are required.");
+      return;
+    }
+    setClaimSaving(true);
+    setClaimError("");
+    try {
+      await base44.functions.invoke("awsClaims", {
+        action: "create",
+        clinic_id: clinicId,
+        claim: {
+          ...claimForm,
+          cpt_codes: claimForm.cpt_codes.split(",").map(s => s.trim()).filter(Boolean),
+          icd_codes: claimForm.icd_codes.split(",").map(s => s.trim()).filter(Boolean),
+          amount_billed: parseFloat(claimForm.amount_billed),
+        },
+      });
+      toast.success("Claim created successfully.");
+      setNewClaimOpen(false);
+      setClaimForm(defaultClaimForm);
+      fetchClaims();
+    } catch (err) {
+      setClaimError(err.message || "Failed to create claim. Please try again.");
+    } finally {
+      setClaimSaving(false);
+    }
+  };
+
+  const handleAIAnalyze = async () => {
+    setAnalyzing(true);
+    setAiOpen(true);
+    setAiResult("");
+    try {
+      const summary = {
+        total: claims.length,
+        denied: claims.filter(c => c.status === "denied").length,
+        pending: claims.filter(c => c.status === "pending").length,
+        paid: claims.filter(c => c.status === "paid").length,
+        totalBilled: claims.reduce((s, c) => s + (Number(c.amount_billed) || 0), 0),
+        totalPaid: claims.reduce((s, c) => s + (Number(c.amount_paid) || 0), 0),
+      };
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a medical billing AI analyst. Analyze this clinic's claims data and provide 5 actionable insights:
+- Total claims: ${summary.total}
+- Denied: ${summary.denied}
+- Pending: ${summary.pending}
+- Paid: ${summary.paid}
+- Total billed: $${summary.totalBilled.toLocaleString()}
+- Total collected: $${summary.totalPaid.toLocaleString()}
+- Collection rate: ${summary.totalBilled > 0 ? Math.round((summary.totalPaid / summary.totalBilled) * 100) : 0}%
+
+Provide specific, actionable insights about denial patterns, collection opportunities, and workflow improvements. Format as numbered list.`,
+      });
+      setAiResult(typeof response === "string" ? response : response?.text || "No analysis available.");
+    } catch (e) {
+      setAiResult("AI analysis unavailable: " + (e.message || "Try again."));
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   const filtered = claims.filter(c => {
     const patient = c.patient_name || c.patient || "";
@@ -63,8 +145,13 @@ export default function Claims() {
           <p className="text-sm text-muted-foreground mt-0.5">Track, manage & optimize your claims pipeline</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2"><BrainCircuit className="w-4 h-4" /> AI Analyze</Button>
-          <Button className="gap-2"><Plus className="w-4 h-4" /> New Claim</Button>
+          <Button variant="outline" className="gap-2" onClick={handleAIAnalyze} disabled={analyzing}>
+            {analyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
+            AI Analyze
+          </Button>
+          <Button className="gap-2" onClick={() => setNewClaimOpen(true)}>
+            <Plus className="w-4 h-4" /> New Claim
+          </Button>
         </div>
       </div>
 
@@ -108,7 +195,10 @@ export default function Claims() {
         ) : error ? (
           <div className="flex items-center justify-center py-20 text-red-500">{error}</div>
         ) : filtered.length === 0 ? (
-          <div className="flex items-center justify-center py-20 text-muted-foreground">No claims found.</div>
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
+            <p>No claims found.</p>
+            <Button size="sm" onClick={() => setNewClaimOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Add your first claim</Button>
+          </div>
         ) : (
           <Table>
             <TableHeader>
@@ -145,19 +235,14 @@ export default function Claims() {
                     <TableCell className="text-sm text-muted-foreground">{days}d</TableCell>
                     <TableCell>
                       {claim.status === "denied" && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-primary text-xs gap-1 h-7"
+                        <Button size="sm" variant="ghost" className="text-primary text-xs gap-1 h-7"
                           onClick={async () => {
                             try {
                               await base44.functions.invoke("awsClaims", { action: "appeal", clinic_id: clinicId, claim_id: claim.id || claim.claim_number });
-                              toast.success(`Appeal submitted for claim ${claim.claim_number || claim.id}`);
-                            } catch(e) {
-                              toast.error("Appeal failed: " + (e.message || "Try again."));
-                            }
-                          }}
-                        >
+                              toast.success(`Appeal submitted for ${claim.claim_number || claim.id}`);
+                              fetchClaims();
+                            } catch(e) { toast.error("Appeal failed: " + (e.message || "Try again.")); }
+                          }}>
                           Appeal <ArrowRight className="w-3 h-3" />
                         </Button>
                       )}
@@ -169,6 +254,68 @@ export default function Claims() {
           </Table>
         )}
       </motion.div>
+
+      {/* New Claim Dialog */}
+      <Dialog open={newClaimOpen} onOpenChange={(v) => { if (!claimSaving) { setNewClaimOpen(v); setClaimError(""); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>New Claim</DialogTitle></DialogHeader>
+          <form onSubmit={handleNewClaimSubmit} className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label className="text-xs">Patient Name *</Label>
+                <Input className="mt-1" value={claimForm.patient_name} onChange={e => setClaimForm(p => ({...p, patient_name: e.target.value}))} placeholder="Full name" /></div>
+              <div><Label className="text-xs">Provider</Label>
+                <Input className="mt-1" value={claimForm.provider_name} onChange={e => setClaimForm(p => ({...p, provider_name: e.target.value}))} placeholder="Dr. Name" /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label className="text-xs">Payer Name *</Label>
+                <Input className="mt-1" value={claimForm.payer_name} onChange={e => setClaimForm(p => ({...p, payer_name: e.target.value}))} placeholder="e.g. BlueCross" /></div>
+              <div><Label className="text-xs">Service Date *</Label>
+                <Input className="mt-1" type="date" value={claimForm.service_date} onChange={e => setClaimForm(p => ({...p, service_date: e.target.value}))} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label className="text-xs">CPT Codes (comma-separated)</Label>
+                <Input className="mt-1" value={claimForm.cpt_codes} onChange={e => setClaimForm(p => ({...p, cpt_codes: e.target.value}))} placeholder="99213, 27447" /></div>
+              <div><Label className="text-xs">ICD-10 Codes (comma-separated)</Label>
+                <Input className="mt-1" value={claimForm.icd_codes} onChange={e => setClaimForm(p => ({...p, icd_codes: e.target.value}))} placeholder="J06.9, M17.11" /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label className="text-xs">Amount Billed ($) *</Label>
+                <Input className="mt-1" type="number" min="0" step="0.01" value={claimForm.amount_billed} onChange={e => setClaimForm(p => ({...p, amount_billed: e.target.value}))} placeholder="0.00" /></div>
+              <div><Label className="text-xs">Status</Label>
+                <Select value={claimForm.status} onValueChange={v => setClaimForm(p => ({...p, status: v}))}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="submitted">Submitted</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="accepted">Accepted</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {claimError && <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded p-2"><AlertCircle className="w-4 h-4 shrink-0" />{claimError}</div>}
+            <div className="flex gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setNewClaimOpen(false)} className="flex-1" disabled={claimSaving}>Cancel</Button>
+              <Button type="submit" className="flex-1 gap-2" disabled={claimSaving}>
+                {claimSaving && <Loader2 className="w-4 h-4 animate-spin" />} Create Claim
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Analysis Dialog */}
+      <Dialog open={aiOpen} onOpenChange={setAiOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><BrainCircuit className="w-5 h-5 text-primary" /> AI Claims Analysis</DialogTitle></DialogHeader>
+          {analyzing ? (
+            <div className="flex items-center gap-3 py-8 justify-center text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin" /> Analyzing your claims data...
+            </div>
+          ) : (
+            <div className="text-sm whitespace-pre-wrap text-foreground leading-relaxed max-h-96 overflow-y-auto">{aiResult}</div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

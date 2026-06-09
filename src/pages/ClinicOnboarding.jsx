@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ export default function ClinicOnboarding() {
       window.location.href = "/customer/dashboard";
     } catch (e) {
       console.error("Onboarding error:", e);
+      toast.error("Onboarding error:");
     } finally {
       setLoading(false);
     }

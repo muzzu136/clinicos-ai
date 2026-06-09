@@ -40,13 +40,30 @@ export default function Reputation() {
   const generateAIReply = async (review) => {
     setSelectedReview(review);
     setGeneratedReply("Generating AI response...");
-    setTimeout(() => {
-      const replies = {
-        positive: `Thank you so much for the wonderful review! We truly appreciate your kind words and are thrilled that ${review.patient} had such a positive experience. Your satisfaction is our greatest reward!`,
-        negative: `We sincerely apologize for the experience ${review.patient} had. Your feedback is invaluable to us. We'd like to make this right — please contact us directly at [clinic contact] so we can address your concerns.`
-      };
-      setGeneratedReply(replies[review.sentiment]);
-    }, 800);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a professional healthcare clinic social media manager. Write a concise, empathetic, HIPAA-compliant response to this patient review.
+
+Platform: ${review.platform}
+Rating: ${review.rating}/5
+Review: "${review.text}"
+Sentiment: ${review.sentiment}
+
+Rules:
+- Never acknowledge specific medical details or confirm/deny treatment
+- Keep under 100 words
+- Be warm, professional, and genuine
+- For negative reviews: apologize, offer to resolve offline
+- For positive reviews: thank them sincerely
+- Do NOT use patient name in response (HIPAA)
+- End with clinic contact invitation for negative reviews
+
+Write only the reply text, no preamble.`,
+      });
+      setGeneratedReply(typeof response === "string" ? response : response?.text || "Unable to generate reply.");
+    } catch (e) {
+      setGeneratedReply("AI reply generation failed. Please try again.");
+    }
   };
 
   return (
@@ -72,7 +89,7 @@ export default function Reputation() {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => { setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Close</Button>
-                <Button onClick={async () => { try { await base44.functions.invoke("awsReputation", { action: "post_reply", clinic_id: clinicId, review_id: selectedReview?.id, reply: aiReply }); toast.success("Reply posted successfully!"); } catch(e) { toast.error("Failed to post reply: " + (e.message || "Try again.")); } setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Post Reply</Button>
+                <Button onClick={async () => { try { await base44.functions.invoke("awsReputation", { action: "post_reply", clinic_id: clinicId, review_id: selectedReview?.id, reply: generatedReply }); toast.success("Reply posted successfully!"); } catch(e) { toast.error("Failed to post reply: " + (e.message || "Try again.")); } setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Post Reply</Button>
               </div>
             </div>
           </div>

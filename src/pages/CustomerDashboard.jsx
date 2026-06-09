@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import { Loader2 } from "lucide-react";
 import KPICard from "@/components/dashboard/KPICard";
@@ -48,6 +49,7 @@ export default function CustomerDashboard() {
         ]);
       } catch (e) {
         console.error("Failed to load clinic data:", e);
+      toast.error("Failed to load clinic data:");
       } finally {
         setLoading(false);
       }
