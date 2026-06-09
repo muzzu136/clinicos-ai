@@ -5,9 +5,10 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 import {
   CheckCircle2, Zap, BrainCircuit, DollarSign,
-  TrendingUp, Star, Phone, MapPin, Crown, ArrowRight
+  TrendingUp, Star, Phone, MapPin, Crown, ArrowRight, Loader2
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -149,7 +150,6 @@ export default function Subscription() {
       toast.error("Failed to add addon: " + (e.message || "Please contact support."));
     } finally { setAddingAddon(null); }
   };
-  const { clinicId } = useClinic();
   const [billing, setBilling] = useState("monthly");
   const currentPlan = "Professional";
   const totalRecovered = recoveryData.reduce((s, d) => s + d.recovered, 0);
