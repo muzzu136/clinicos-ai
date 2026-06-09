@@ -81,7 +81,7 @@ export default function RecoveryWorklist() {
         </div>
         <div className="bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
           <span className="text-xs text-muted-foreground">Recoverable: </span>
-          <span className="text-sm font-bold text-emerald-700">${totalRecoverable.toLocaleString()}</span>
+          <span className="text-sm font-bold text-emerald-700">${(Number(totalRecoverable) || 0).toLocaleString()}</span>
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export default function RecoveryWorklist() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span className="text-lg font-heading font-bold text-foreground">${item.amount.toLocaleString()}</span>
+                  <span className="text-lg font-heading font-bold text-foreground">${(Number(item.amount) || 0).toLocaleString()}</span>
                   {!isDone && (
                     <Button size="sm" onClick={() => advance(item.id)} className="h-7 text-xs gap-1">
                       Advance <ArrowRight className="w-3 h-3" />

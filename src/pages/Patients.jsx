@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export default function Patients() {
   const [editingPatient, setEditingPatient] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError(null);
     if (!clinicId) {
@@ -48,7 +48,8 @@ export default function Patients() {
       setError(e.message);
     }
     setLoading(false);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clinicId]);
 
   useEffect(() => {
     // When ClinicContext finishes loading (even without clinicId), stop the spinner
@@ -191,9 +192,13 @@ export default function Patients() {
         open={dialogOpen} 
         onOpenChange={setDialogOpen} 
         clinicId={clinicId}
-        onPatientAdded={() => {
-          setLoading(true);
-          fetchPatients();
+        onPatientAdded={(newPatient) => {
+          // Optimistically add to list immediately
+          if (newPatient) {
+            setPatients(prev => [newPatient, ...prev]);
+          }
+          // Then refetch after short delay to sync with server
+          setTimeout(() => fetchPatients(), 800);
         }}
       />
 
@@ -203,7 +208,6 @@ export default function Patients() {
         patient={editingPatient}
         clinicId={clinicId}
         onPatientUpdated={() => {
-          setLoading(true);
           fetchPatients();
         }}
       />

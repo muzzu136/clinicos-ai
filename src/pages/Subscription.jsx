@@ -204,7 +204,7 @@ export default function Subscription() {
             <p className="text-xs text-muted-foreground mt-0.5">Revenue recovered from denied/rejected claims by AI automation</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-heading font-bold text-emerald-600">${totalRecovered.toLocaleString()}</p>
+            <p className="text-2xl font-heading font-bold text-emerald-600">${(Number(totalRecovered) || 0).toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Total Recovered (6 months)</p>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function Subscription() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {plans.map((plan, i) => {
-            const price = billing === "annual" ? Math.round(plan.price * 0.80) : plan.price;
+            const price = plan.price === null ? null : (billing === "annual" ? Math.round(plan.price * 0.80) : plan.price);
             const isCurrent = plan.name === currentPlan;
             return (
               <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
@@ -266,9 +266,15 @@ export default function Subscription() {
                   <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{plan.description}</p>
                 </div>
                 <div className="mb-5">
-                  <span className="text-3xl font-heading font-bold">${price.toLocaleString()}</span>
+                  <span className="text-3xl font-heading font-bold">
+                    {price === null ? "Custom" : `$${price.toLocaleString()}`}
+                  </span>
                   <span className="text-sm text-muted-foreground">/mo</span>
-                  {billing === "annual" && <p className="text-xs text-emerald-600 font-medium mt-0.5">Save ${((plan.price - price) * 12).toLocaleString()}/yr</p>}
+                  {billing === "annual" && plan.price !== null && price !== null && (
+                    <p className="text-xs text-emerald-600 font-medium mt-0.5">
+                      Save ${((plan.price - price) * 12).toLocaleString()}/yr
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1.5 flex-1 mb-5">
                   {plan.features.map((f, j) => (

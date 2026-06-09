@@ -322,7 +322,7 @@ export default function RevenueCycle() {
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="text-sm text-muted-foreground">{item.count} claims</span>
-                      <span className="text-sm font-semibold w-24 text-right">${item.amount.toLocaleString()}</span>
+                      <span className="text-sm font-semibold w-24 text-right">${(Number(item.amount) || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 ))}
@@ -373,7 +373,7 @@ export default function RevenueCycle() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">{item.reason}</p>
-                      <p className="text-xs text-muted-foreground">{item.count} claims · ${item.amount.toLocaleString()} billed</p>
+                      <p className="text-xs text-muted-foreground">{item.count} claims · ${(Number(item.amount) || 0).toLocaleString()} billed</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-emerald-600">${item.recoverable.toLocaleString()}</p>

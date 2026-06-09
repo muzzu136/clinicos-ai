@@ -14,7 +14,7 @@ export default function AddLeadDialog({ open, onClose, clinicId, onSuccess }) {
     if (!formData.name || !formData.email) return;
     setLoading(true);
     try {
-      await base44.entities.Lead.create({
+      const created = await base44.entities.Lead.create({
         clinic_id: clinicId,
         name: formData.name,
         email: formData.email,
@@ -25,7 +25,7 @@ export default function AddLeadDialog({ open, onClose, clinicId, onSuccess }) {
         score: Math.floor(Math.random() * 40) + 60
       });
       setFormData({ name: "", email: "", phone: "", source: "website", service: "" });
-      onSuccess?.();
+      onSuccess?.(created);
       onClose();
     } catch (e) {
       console.error("Failed to create lead:", e);

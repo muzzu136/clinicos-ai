@@ -123,7 +123,7 @@ export default function MultiLocation() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: "Network Revenue (MTD)", value: `$${(totalRevenue/1000).toFixed(0)}K`, icon: DollarSign, color: "bg-emerald-50 text-emerald-600" },
-          { label: "Total Active Patients", value: totalPatients.toLocaleString(), icon: Users, color: "bg-primary/10 text-primary" },
+          { label: "Total Active Patients", value: (Number(totalPatients) || 0).toLocaleString(), icon: Users, color: "bg-primary/10 text-primary" },
           { label: "Active Locations", value: activeLocations.length, icon: Building2, color: "bg-violet-50 text-violet-600" },
           { label: "Avg Utilization", value: `${Math.round(activeLocations.reduce((s, l) => s + l.utilization, 0) / activeLocations.length)}%`, icon: TrendingUp, color: "bg-amber-50 text-amber-600" },
         ].map((stat, i) => (
@@ -181,7 +181,7 @@ export default function MultiLocation() {
                       <p className="text-xs text-muted-foreground">Revenue MTD</p>
                     </div>
                     <div className="text-center p-2 bg-muted/40 rounded-lg">
-                      <p className="text-sm font-bold">{loc.patients.toLocaleString()}</p>
+                      <p className="text-sm font-bold">{(Number(loc.patients) || 0).toLocaleString()}</p>
                       <p className="text-xs text-muted-foreground">Patients</p>
                     </div>
                     <div className="text-center p-2 bg-muted/40 rounded-lg">

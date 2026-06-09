@@ -85,10 +85,21 @@ export default function Claims() {
           amount_billed: parseFloat(claimForm.amount_billed),
         },
       });
+      // Optimistic update
+      const optimistic = {
+        ...claimForm,
+        id: `temp_${Date.now()}`,
+        claim_number: `DRAFT-${Date.now()}`,
+        cpt_codes: claimForm.cpt_codes.split(",").map(s => s.trim()).filter(Boolean),
+        amount_billed: parseFloat(claimForm.amount_billed),
+        amount_paid: 0,
+        days_outstanding: 0,
+      };
+      setClaims(prev => [optimistic, ...prev]);
       toast.success("Claim created successfully.");
       setNewClaimOpen(false);
       setClaimForm(defaultClaimForm);
-      fetchClaims();
+      setTimeout(() => fetchClaims(), 800);
     } catch (err) {
       setClaimError(err.message || "Failed to create claim. Please try again.");
     } finally {

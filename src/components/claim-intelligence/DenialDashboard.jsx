@@ -121,7 +121,7 @@ export default function DenialDashboard() {
                 <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                   <div className="h-full rounded-full bg-red-400" style={{ width: `${(item.count / 89) * 100}%` }} />
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5">${item.amount.toLocaleString()} at risk</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">${(Number(item.amount) || 0).toLocaleString()} at risk</p>
               </div>
             ))}
           </div>
@@ -161,7 +161,7 @@ export default function DenialDashboard() {
                     <td className="px-4 py-3">
                       <Badge variant="outline" className="font-mono text-xs">{row.code}</Badge>
                     </td>
-                    <td className="px-4 py-3 font-semibold">${row.amount.toLocaleString()}</td>
+                    <td className="px-4 py-3 font-semibold">${(Number(row.amount) || 0).toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <Badge className={`${sev.cls} text-xs border`}>{sev.label}</Badge>
                     </td>

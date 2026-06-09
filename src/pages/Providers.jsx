@@ -67,7 +67,10 @@ export default function Providers() {
           <p className="text-sm text-muted-foreground mt-0.5">AI-powered provider performance analytics</p>
         </div>
         <Button onClick={() => setShowAddDialog(true)} className="gap-2"><Plus className="w-4 h-4" />Add Provider</Button>
-        <AddProviderDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} clinicId={clinicId} onSuccess={fetchProviders} />
+        <AddProviderDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} clinicId={clinicId} onSuccess={(newProvider) => {
+        if (newProvider) setProvidersList(prev => [newProvider, ...prev]);
+        setTimeout(() => fetchProviders(), 800);
+      }} />
       </div>
 
       {/* Provider Cards */}

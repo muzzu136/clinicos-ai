@@ -63,7 +63,10 @@ export default function Leads() {
           <p className="text-sm text-muted-foreground mt-0.5">Patient acquisition CRM & conversion tracking</p>
         </div>
         <Button onClick={() => setShowNewDialog(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Lead</Button>
-        <AddLeadDialog open={showNewDialog} onClose={() => setShowNewDialog(false)} clinicId={clinicId} onSuccess={fetchLeads} />
+        <AddLeadDialog open={showNewDialog} onClose={() => setShowNewDialog(false)} clinicId={clinicId} onSuccess={(newLead) => {
+        if (newLead) setLeadsList(prev => [newLead, ...prev]);
+        setTimeout(() => fetchLeads(), 800);
+      }} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

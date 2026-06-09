@@ -78,7 +78,7 @@ export default function DenialAnalyzerTool() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "Total Denials", value: mockDenials.length, color: "text-foreground" },
-          { label: "Total At Risk", value: `$${totalAtRisk.toLocaleString()}`, color: "text-red-600" },
+          { label: "Total At Risk", value: `$${(Number(totalAtRisk) || 0).toLocaleString()}`, color: "text-red-600" },
           { label: "Approaching Deadline", value: "2 claims", color: "text-amber-600" },
         ].map((s, i) => (
           <div key={i} className="bg-card rounded-xl border border-border p-3 text-center">
@@ -105,7 +105,7 @@ export default function DenialAnalyzerTool() {
                   </div>
                 </div>
                 <Badge className={`${info.color} border text-xs shrink-0`}>{denial.code}</Badge>
-                <span className="font-semibold text-sm text-red-600 shrink-0">${denial.amount.toLocaleString()}</span>
+                <span className="font-semibold text-sm text-red-600 shrink-0">${(Number(denial.amount) || 0).toLocaleString()}</span>
                 {isOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
               </button>
 

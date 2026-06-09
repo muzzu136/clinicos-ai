@@ -41,14 +41,23 @@ export default function AddPatientDialog({ open, onOpenChange, clinicId, onPatie
     setLoading(true);
     setError("");
     try {
-      await base44.functions.invoke("awsPatients", {
+      const res = await base44.functions.invoke("awsPatients", {
         action: "create",
         clinic_id: clinicId,
         data: formData,
       });
+      // Build optimistic patient record for instant display
+      const createdPatient = res?.data || {
+        ...formData,
+        name: `${formData.first_name} ${formData.last_name}`.trim(),
+        id: `temp_${Date.now()}`,
+        status: formData.status || "active",
+        churn_risk_score: 0,
+        total_revenue: 0,
+      };
       setFormData(defaultForm);
       onOpenChange(false);
-      onPatientAdded?.();
+      onPatientAdded?.(createdPatient);
     } catch (err) {
       setError(err.message || "Failed to add patient. Please try again.");
     } finally {
