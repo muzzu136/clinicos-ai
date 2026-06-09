@@ -35,12 +35,10 @@ export default function Patients() {
   const fetchPatients = useCallback(async () => {
     setLoading(true);
     setError(null);
-    if (!clinicId) {
-      setLoading(false);
-      return;
-    }
     try {
-      const res = await base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId });
+      // Pass clinic_id if available, but still fetch even without it
+      const payload = clinicId ? { action: "list", clinic_id: clinicId } : { action: "list" };
+      const res = await base44.functions.invoke("awsPatients", payload);
       const raw = res.data;
       const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.patients) ? raw.patients : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
       setPatients(list);
@@ -52,13 +50,8 @@ export default function Patients() {
   }, [clinicId]);
 
   useEffect(() => {
-    // When ClinicContext finishes loading (even without clinicId), stop the spinner
     if (!clinicLoading) {
-      if (clinicId) {
-        fetchPatients();
-      } else {
-        setLoading(false);
-      }
+      fetchPatients();
     }
   }, [clinicId, clinicLoading]);
 
