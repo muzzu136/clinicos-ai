@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
-import { Loader2 } from "lucide-react";
 import KPICard from "@/components/dashboard/KPICard";
-import { DollarSign, Users, Calendar, TrendingUp, FileText } from "lucide-react";
+import { Calendar, DollarSign, FileText, Loader2, TrendingUp, Users } from "lucide-react";
 
 export default function CustomerDashboard() {
   const [clinic, setClinic] = useState(null);

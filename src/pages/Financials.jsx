@@ -4,8 +4,9 @@ import { useClinic } from "@/components/ClinicContext";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
+  AreaChart, Area, BarChart, Bar, LineChart, Line, ReferenceLine,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell
 } from "recharts";
 import {
   DollarSign, TrendingUp, TrendingDown, BarChart3,
@@ -13,8 +14,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-import { LineChart, Line, ReferenceLine } from "recharts";
 
 const revenueByService = [
   { service: "Office Visits", revenue: 89400, color: "hsl(217, 91%, 60%)" },

@@ -1,12 +1,11 @@
 import { useState, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useClinic } from "@/components/ClinicContext";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload, ChevronDown, ChevronUp, Lightbulb, AlertCircle } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Lightbulb, Loader2, Upload } from "lucide-react";
 
 const DENIAL_CODES = {
   "CO-16": { category: "Missing/Invalid Info", color: "bg-red-100 text-red-700 border-red-200", plain: "The claim is missing required information or has a billing error. Most common denial reason — check all required fields on the claim form." },
