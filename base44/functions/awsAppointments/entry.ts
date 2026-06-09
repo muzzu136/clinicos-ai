@@ -12,6 +12,10 @@ Deno.serve(async (req) => {
 
     const { action, id, data, clinic_id } = await req.json();
 
+    if (!clinic_id) {
+      return Response.json({ error: 'clinic_id is required' }, { status: 400 });
+    }
+
     const BASE = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
     let url = `${BASE}/appointments`;
     let method = 'GET';
@@ -19,7 +23,7 @@ Deno.serve(async (req) => {
 
     if (action === 'list') {
       method = 'GET';
-      if (clinic_id) url += `?clinic_id=${encodeURIComponent(clinic_id)}`;
+      url += `?clinic_id=${encodeURIComponent(clinic_id)}`;
     } else if (action === 'get') {
       url = `${BASE}/appointments/${id}`;
       method = 'GET';

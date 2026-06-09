@@ -33,12 +33,14 @@ export default function Patients() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchPatients = useCallback(async () => {
+    if (!clinicId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      // Pass clinic_id if available, but still fetch even without it
-      const payload = clinicId ? { action: "list", clinic_id: clinicId } : { action: "list" };
-      const res = await base44.functions.invoke("awsPatients", payload);
+      const res = await base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId });
       const raw = res.data;
       const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.patients) ? raw.patients : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
       setPatients(list);
@@ -51,7 +53,11 @@ export default function Patients() {
 
   useEffect(() => {
     if (!clinicLoading) {
-      fetchPatients();
+      if (clinicId) {
+        fetchPatients();
+      } else {
+        setLoading(false);
+      }
     }
   }, [clinicId, clinicLoading]);
 
