@@ -29,7 +29,8 @@ export default function Login() {
   };
 
   const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/");
+    // Always redirect to /dashboard after Google login, never back to /login
+    base44.auth.loginWithProvider("google", "/dashboard");
   };
 
   return (

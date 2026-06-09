@@ -48,26 +48,15 @@ import ClaimIntelligence from '@/pages/ClaimIntelligence';
 import { ClinicProvider } from '@/components/ClinicContext';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { authError } = useAuth();
 
-  if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-          <p className="text-sm text-muted-foreground font-medium">Loading ClinicOS AI...</p>
-        </div>
-      </div>
-    );
+  // Only show the user_not_registered error globally
+  if (authError?.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    }
-    // Don't auto-redirect for auth_required — let public routes render
-    // Protected routes handle their own redirects via ProtectedRoute
-  }
+  // NOTE: No global loading spinner here — public pages (landing, login, register)
+  // render immediately. Protected pages show their own loading states via ProtectedRoute.
 
   return (
     <Routes>

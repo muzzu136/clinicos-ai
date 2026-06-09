@@ -3,12 +3,14 @@ import { appParams } from '@/lib/app-params';
 
 const { appId, token, functionsVersion, appBaseUrl } = appParams;
 
-// Create a client with authentication required (HIPAA-compliant)
+// requiresAuth: false — we handle auth ourselves in AuthContext
+// Setting true causes the SDK to redirect to login on ANY failed API call,
+// which is what was causing the infinite redirect loop on clinicosai.org
 export const base44 = createClient({
   appId,
   token,
   functionsVersion,
   serverUrl: '',
-  requiresAuth: true,
+  requiresAuth: false,
   appBaseUrl
 });

@@ -3,20 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import LandingPage from '@/pages/LandingPage';
 
-/**
- * Shows the landing page to guests.
- * Authenticated users are redirected to /dashboard.
- */
 export default function PublicHomePage() {
-  const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings } = useAuth();
+  const { isAuthenticated, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoadingAuth && !isLoadingPublicSettings && isAuthenticated) {
+    // Only redirect to dashboard after auth check is complete AND user is authenticated
+    if (!isLoadingAuth && isAuthenticated) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoadingAuth, isLoadingPublicSettings, navigate]);
+  }, [isAuthenticated, isLoadingAuth, navigate]);
 
-  // Still loading auth — show landing page (not a blank screen)
+  // Always render landing page immediately — redirect happens in background
   return <LandingPage />;
 }
