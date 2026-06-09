@@ -350,7 +350,7 @@ export default function Settings() {
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <Badge className="bg-primary text-primary-foreground mb-2">Professional Plan — Active</Badge>
-                <h3 className="text-2xl font-heading font-bold">$1,499 / month</h3>
+                <h3 className="text-2xl font-heading font-bold">$799 / month</h3>
                 <p className="text-sm text-muted-foreground mt-1">Billed monthly · Next renewal: July 4, 2026</p>
               </div>
               <Button variant="outline">Upgrade to Enterprise</Button>
@@ -361,10 +361,10 @@ export default function Settings() {
             <h3 className="font-heading font-semibold mb-3">Subscription Plans</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { name: "Starter", price: "$299", period: "/mo", features: ["Up to 1 provider", "Core scheduling", "Basic RCM", "Email support"], current: false, highlight: false },
-                { name: "Growth", price: "$699", period: "/mo", features: ["Up to 3 providers", "AI campaigns", "Reputation mgmt", "Call intelligence"], current: false, highlight: false },
-                { name: "Professional", price: "$1,499", period: "/mo", features: ["Up to 6 providers", "Full RCM suite", "Predictive analytics", "AI Copilot"], current: true, highlight: true },
-                { name: "Enterprise", price: "$2,999+", period: "/mo", features: ["Unlimited providers", "Multi-location", "White label", "Dedicated CSM"], current: false, highlight: false },
+                { name: "Starter", price: "$149", period: "/mo", features: ["1 provider", "Patients & appointments", "Claims management", "Email support"], current: false, highlight: false },
+                { name: "Growth", price: "$399", period: "/mo", features: ["Up to 3 providers", "Full RCM + Claim Intelligence", "AI Copilot", "Campaigns & Leads"], current: false, highlight: false },
+                { name: "Professional", price: "$799", period: "/mo", features: ["Up to 8 providers", "Everything in Growth", "Financial forecasting", "Phone & chat support"], current: true, highlight: true },
+                { name: "Enterprise", price: "Custom", period: "", features: ["Unlimited providers", "Multi-location", "White label", "Dedicated CSM"], current: false, highlight: false },
               ].map((plan, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                   className={`rounded-xl border p-5 ${plan.highlight ? "border-primary ring-1 ring-primary bg-primary/5" : "border-border bg-card"}`}>
