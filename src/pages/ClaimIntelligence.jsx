@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ShieldAlert } from "lucide-react";
 import DenialDashboard from "@/components/claim-intelligence/DenialDashboard";
@@ -6,6 +9,7 @@ import DenialAnalyzerTool from "@/components/claim-intelligence/DenialAnalyzerTo
 import RecoveryWorklist from "@/components/claim-intelligence/RecoveryWorklist";
 
 export default function ClaimIntelligence() {
+  const { clinicId } = useClinic();
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
       <div className="flex items-center gap-3">

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -115,6 +117,7 @@ const recoveryData = [
 ];
 
 export default function Subscription() {
+  const { clinicId } = useClinic();
   const [billing, setBilling] = useState("monthly");
   const currentPlan = "Professional";
   const totalRecovered = recoveryData.reduce((s, d) => s + d.recovered, 0);

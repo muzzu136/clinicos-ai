@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Calendar, Clock, Plus, TrendingUp, XCircle, Video, Loader2 } from "luci
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { base44 } from "@/api/base44Client";
 import NewAppointmentDialog from "@/components/appointments/NewAppointmentDialog";
+import { useClinic } from "@/components/ClinicContext";
 
 const statusColors = {
   scheduled: "bg-primary/10 text-primary",
@@ -21,16 +22,17 @@ const statusColors = {
 };
 
 export default function Appointments() {
+  const { clinicId } = useClinic();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showNewDialog, setShowNewDialog] = useState(false);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await base44.functions.invoke("awsAppointments", { action: "list" });
+      const res = await base44.functions.invoke("awsAppointments", { action: "list", clinic_id: clinicId });
       const raw = res.data;
       const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.appointments) ? raw.appointments : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
       setAppointments(list);
@@ -38,11 +40,11 @@ export default function Appointments() {
       setError(e.message);
     }
     setLoading(false);
-  };
+  }, [clinicId]);
 
   useEffect(() => {
     fetchAppointments();
-  }, []);
+  }, [fetchAppointments]);
 
   const today = appointments.filter(a => {
     if (!a.appointment_date) return false;
@@ -52,9 +54,23 @@ export default function Appointments() {
   const confirmed = appointments.filter(a => a.status === "confirmed").length;
   const noShows = appointments.filter(a => a.status === "no_show").length;
 
+  // Only show current week appointments in the chart
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+  const thisWeekAppts = appointments.filter(a => {
+    if (!a.appointment_date) return false;
+    const d = new Date(a.appointment_date);
+    return d >= startOfWeek && d < endOfWeek;
+  });
+
   const weekData = days.map(day => {
-    const dayApts = appointments.filter(a => a.appointment_date && days[new Date(a.appointment_date).getDay()] === day);
+    const dayApts = thisWeekAppts.filter(a => days[new Date(a.appointment_date).getDay()] === day);
     return {
       day,
       completed: dayApts.filter(a => a.status === "completed").length,

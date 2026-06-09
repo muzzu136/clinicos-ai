@@ -77,7 +77,7 @@ const AuthenticatedApp = () => {
       <Route path="/onboarding" element={<ClinicOnboarding />} />
 
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route element={<AppLayout />}>
+        <Route element={<ClinicProvider><AppLayout /></ClinicProvider>}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/customer/dashboard" element={<CustomerDashboard />} />
           <Route path="/customer/patients" element={<CustomerPatients />} />
@@ -117,16 +117,14 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <ClinicProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
+    <QueryClientProvider client={queryClientInstance}>
+      <AuthProvider>
+        <Router>
           <AuthenticatedApp />
-          </Router>
           <Toaster />
-        </QueryClientProvider>
-      </ClinicProvider>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 

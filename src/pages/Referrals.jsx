@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,6 +46,7 @@ const sourceData = [
 ];
 
 export default function Referrals() {
+  const { clinicId } = useClinic();
   const [tab, setTab] = useState("physician");
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [showCampaignDialog, setShowCampaignDialog] = useState(false);
@@ -76,7 +80,7 @@ export default function Referrals() {
               </div>
               <div className="flex gap-2 mt-6">
                 <Button variant="outline" onClick={() => setShowRequestDialog(false)} className="flex-1">Cancel</Button>
-                <Button onClick={() => { alert("✓ Referral request sent to " + requestData.physicianEmail); setShowRequestDialog(false); setRequestData({ physicianEmail: "", message: "" }); }} className="flex-1">Send Request</Button>
+                <Button onClick={async () => { try { await base44.functions.invoke("awsReferrals", { action: "send_request", clinic_id: clinicId, ...requestData }); toast.success("Referral request sent to " + requestData.physicianEmail); } catch(e) { toast.error("Failed to send referral: " + (e.message||"Try again.")); } setShowRequestDialog(false); setRequestData({ physicianEmail: "", message: "" }); }} className="flex-1">Send Request</Button>
               </div>
             </div>
           </div>
@@ -109,7 +113,7 @@ export default function Referrals() {
               </div>
               <div className="flex gap-2 mt-6">
                 <Button variant="outline" onClick={() => setShowCampaignDialog(false)} className="flex-1">Cancel</Button>
-                <Button onClick={() => { alert("✓ Campaign '" + campaignData.name + "' created and scheduled!"); setShowCampaignDialog(false); setCampaignData({ name: "", type: "reactivation", channel: "sms" }); }} className="flex-1">Create Campaign</Button>
+                <Button onClick={async () => { try { await base44.functions.invoke("awsCampaigns", { action: "create", clinic_id: clinicId, ...campaignData }); toast.success(`Campaign "${campaignData.name}" created and scheduled!`); } catch(e) { toast.error("Failed to create campaign: " + (e.message||"Try again.")); } setShowCampaignDialog(false); setCampaignData({ name: "", type: "reactivation", channel: "sms" }); }} className="flex-1">Create Campaign</Button>
               </div>
             </div>
           </div>

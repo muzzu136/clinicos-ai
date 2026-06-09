@@ -1,11 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { BrainCircuit, Send, Sparkles, Loader2 } from "lucide-react";
+import { BrainCircuit, Send, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
 
 const suggestedQuestions = [
   "Why did revenue decrease this week?",
@@ -17,6 +18,7 @@ const suggestedQuestions = [
 ];
 
 export default function AICopilot() {
+  const { clinicId } = useClinic();
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -25,11 +27,85 @@ export default function AICopilot() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [clinicData, setClinicData] = useState(null);
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Fetch real clinic KPIs to inject into prompts
+  useEffect(() => {
+    const fetchClinicData = async () => {
+      if (!clinicId) return;
+      try {
+        const [patientsRes, claimsRes, apptRes] = await Promise.allSettled([
+          base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId }),
+          base44.functions.invoke("awsClaims", { action: "list", clinic_id: clinicId }),
+          base44.functions.invoke("awsAppointments", { action: "list", clinic_id: clinicId }),
+        ]);
+
+        const patients = patientsRes.status === "fulfilled"
+          ? (Array.isArray(patientsRes.value.data) ? patientsRes.value.data : patientsRes.value.data?.patients || [])
+          : [];
+        const claims = claimsRes.status === "fulfilled"
+          ? (Array.isArray(claimsRes.value.data) ? claimsRes.value.data : claimsRes.value.data?.claims || [])
+          : [];
+        const appts = apptRes.status === "fulfilled"
+          ? (Array.isArray(apptRes.value.data) ? apptRes.value.data : apptRes.value.data?.appointments || [])
+          : [];
+
+        const activePatients = patients.filter(p => p.status === "active").length;
+        const totalRevenue = patients.reduce((sum, p) => sum + (p.total_revenue || 0), 0);
+        const deniedClaims = claims.filter(c => c.status === "denied");
+        const paidClaims = claims.filter(c => c.status === "paid").length;
+        const collectionRate = claims.length > 0 ? Math.round((paidClaims / claims.length) * 100) : 0;
+        const today = new Date().toDateString();
+        const todayAppts = appts.filter(a => new Date(a.appointment_date).toDateString() === today);
+        const noShows = appts.filter(a => a.status === "no_show").length;
+        const noShowRate = appts.length > 0 ? Math.round((noShows / appts.length) * 100) : 0;
+
+        setClinicData({
+          totalPatients: patients.length,
+          activePatients,
+          totalRevenue,
+          collectionRate,
+          deniedClaimsCount: deniedClaims.length,
+          deniedClaimsAmount: deniedClaims.reduce((s, c) => s + (c.amount_billed || 0), 0),
+          totalClaims: claims.length,
+          noShowRate,
+          todayAppts: todayAppts.length,
+        });
+      } catch (e) {
+        console.error("Failed to load clinic data for copilot:", e);
+      }
+    };
+    fetchClinicData();
+  }, [clinicId]);
+
+  const buildPrompt = useCallback((text, conversationContext) => {
+    const dataSection = clinicData
+      ? `You have access to this clinic's REAL live data:
+- Total patients: ${clinicData.totalPatients} (${clinicData.activePatients} active)
+- Total revenue: $${clinicData.totalRevenue.toLocaleString()}
+- Collection rate: ${clinicData.collectionRate}%
+- No-show rate: ${clinicData.noShowRate}%
+- Denied claims: ${clinicData.deniedClaimsCount} (totaling $${clinicData.deniedClaimsAmount.toLocaleString()})
+- Total claims: ${clinicData.totalClaims}
+- Today's appointments: ${clinicData.todayAppts}`
+      : `Note: Clinic data is still loading. Provide general healthcare operations advice.`;
+
+    return `You are an AI Clinic Operations Copilot for ClinicOS AI. You help clinic administrators understand their practice performance, revenue, patient retention, claims, and operations.
+
+${dataSection}
+
+Previous conversation:
+${conversationContext}
+
+User question: ${text}
+
+Provide a helpful, data-driven response. Use specific numbers and actionable recommendations. Format with markdown for readability. Keep responses concise but thorough.`;
+  }, [clinicData]);
 
   const sendMessage = async (text) => {
     if (!text.trim()) return;
@@ -40,29 +116,21 @@ export default function AICopilot() {
 
     const conversationContext = messages.slice(-6).map(m => `${m.role}: ${m.content}`).join("\n");
 
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are an AI Clinic Operations Copilot for ClinicOS AI. You help clinic administrators understand their practice performance, revenue, patient retention, claims, and operations.
-
-You have access to the following clinic data (use realistic sample data in your responses):
-- Monthly revenue: $242,800 (up 12.4%)
-- Active patients: 2,847
-- Collection rate: 94.2%
-- No-show rate: 4.2%
-- Denied claims: 31 (totaling $47,800)
-- Top providers: Dr. Martinez (92% utilization), Dr. Patel (87%), Dr. Kim (78%)
-- Inactive patients (6mo+): 364
-- Average review rating: 4.8/5
-
-Previous conversation:
-${conversationContext}
-
-User question: ${text}
-
-Provide a helpful, data-driven response. Use specific numbers and actionable recommendations. Format with markdown for readability. Keep responses concise but thorough.`,
-    });
-
-    setMessages(prev => [...prev, { role: "assistant", content: response }]);
-    setLoading(false);
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: buildPrompt(text, conversationContext),
+      });
+      setMessages(prev => [...prev, { role: "assistant", content: response }]);
+    } catch (err) {
+      console.error("AI Copilot error:", err);
+      setMessages(prev => [...prev, {
+        role: "assistant",
+        content: "I encountered an error processing your request. Please try again in a moment.",
+        isError: true,
+      }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,7 +142,9 @@ Provide a helpful, data-driven response. Use specific numbers and actionable rec
         </div>
         <div>
           <h1 className="text-2xl font-heading font-bold text-foreground">AI Clinic Copilot</h1>
-          <p className="text-sm text-muted-foreground">Your intelligent practice advisor</p>
+          <p className="text-sm text-muted-foreground">
+            {clinicData ? "Connected to your live clinic data" : "Your intelligent practice advisor"}
+          </p>
         </div>
       </div>
 
@@ -90,13 +160,15 @@ Provide a helpful, data-driven response. Use specific numbers and actionable rec
             >
               {msg.role === "assistant" && (
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                  <BrainCircuit className="w-4 h-4 text-primary" />
+                  {msg.isError ? <AlertCircle className="w-4 h-4 text-destructive" /> : <BrainCircuit className="w-4 h-4 text-primary" />}
                 </div>
               )}
               <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border"
+                  : msg.isError
+                    ? "bg-destructive/10 border border-destructive/20"
+                    : "bg-card border border-border"
               }`}>
                 {msg.role === "user" ? (
                   <p className="text-sm">{msg.content}</p>

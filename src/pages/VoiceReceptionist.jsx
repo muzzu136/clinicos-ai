@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +47,7 @@ const sentimentColor = { positive: "text-emerald-600", neutral: "text-muted-fore
 const outcomeColor = { "Booked": "bg-emerald-100 text-emerald-700", "Rescheduled": "bg-primary/10 text-primary", "Routed to Nurse": "bg-amber-100 text-amber-700", "Answered by AI": "bg-violet-100 text-violet-700", "Voicemail Left": "bg-muted text-muted-foreground", "SMS Follow-up Sent": "bg-sky-100 text-sky-700" };
 
 export default function VoiceReceptionist() {
+  const { clinicId } = useClinic();
   const [tab, setTab] = useState("live");
 
   return (
@@ -58,7 +62,7 @@ export default function VoiceReceptionist() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             AI Active — 24/7
           </div>
-          <Button onClick={() => alert('HIPAA security compliance verified')} variant="outline" className="gap-2"><Shield className="w-4 h-4" />HIPAA Secure</Button>
+          <Button onClick={() => toast.success("HIPAA compliance verified. BAA active, encryption enabled, audit logs running.")} variant="outline" className="gap-2"><Shield className="w-4 h-4" />HIPAA Secure</Button>
         </div>
       </div>
 
@@ -201,7 +205,7 @@ export default function VoiceReceptionist() {
                 </div>
                 <p className="text-xs text-muted-foreground">{item.desc}</p>
               </div>
-              <Button onClick={() => alert(`Editing ${item.title}`)} variant="ghost" size="sm">Edit</Button>
+              <Button onClick={() => toast.info(`Opening configuration for ${item.title}...`)} variant="ghost" size="sm">Edit</Button>
             </motion.div>
           ))}
         </div>

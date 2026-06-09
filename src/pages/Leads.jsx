@@ -7,10 +7,11 @@ import {
   Plus, UserPlus, TrendingUp, Target, DollarSign,
   Phone, Mail, Globe, ArrowRight
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import AddLeadDialog from "@/components/dialogs/AddLeadDialog";
-import { useAuth } from "@/lib/AuthContext";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 
 const leads = [
   { name: "Jennifer Smith", email: "jen@email.com", phone: "(555) 111-2222", source: "Google Ads", service: "Dental Cleaning", status: "new", score: 85, date: "Nov 22" },
@@ -33,31 +34,26 @@ const statusConfig = {
 const sourceIcons = { "Google Ads": Globe, Website: Globe, Referral: UserPlus, Facebook: Globe, "Walk-in": UserPlus };
 
 export default function Leads() {
+  const { clinicId } = useClinic();
   const [showNewDialog, setShowNewDialog] = useState(false);
-  const [leadsList, setLeadsList] = useState(leads);
-  const [clinicId, setClinicId] = useState("");
-  const { user } = useAuth();
+  const [leadsList, setLeadsList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchClinic = async () => {
-      try {
-        const clinics = await base44.entities.Clinic.filter({ admin_id: user?.id });
-        if (clinics.length > 0) setClinicId(clinics[0].id);
-      } catch (e) {
-        console.error("Failed to fetch clinic:", e);
-      }
-    };
-    if (user?.id) fetchClinic();
-  }, [user?.id]);
-
-  const handleLeadAdded = async () => {
+  const fetchLeads = useCallback(async () => {
+    if (!clinicId) return;
+    setLoading(true);
     try {
-      const updatedLeads = await base44.entities.Lead.filter({ clinic_id: clinicId });
-      setLeadsList(updatedLeads.length > 0 ? updatedLeads : leads);
+      const res = await base44.entities.Lead.filter({ clinic_id: clinicId });
+      setLeadsList(res.length > 0 ? res : leads);
     } catch (e) {
       console.error("Failed to load leads:", e);
+      setLeadsList(leads);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [clinicId]);
+
+  useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto">
@@ -67,7 +63,7 @@ export default function Leads() {
           <p className="text-sm text-muted-foreground mt-0.5">Patient acquisition CRM & conversion tracking</p>
         </div>
         <Button onClick={() => setShowNewDialog(true)} className="gap-2"><Plus className="w-4 h-4" /> Add Lead</Button>
-        <AddLeadDialog open={showNewDialog} onClose={() => setShowNewDialog(false)} clinicId={clinicId} onSuccess={handleLeadAdded} />
+        <AddLeadDialog open={showNewDialog} onClose={() => setShowNewDialog(false)} clinicId={clinicId} onSuccess={fetchLeads} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

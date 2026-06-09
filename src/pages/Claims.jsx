@@ -7,6 +7,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, Plus, FileText, DollarSign, CheckCircle2, XCircle, Clock, AlertTriangle, BrainCircuit, ArrowRight, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 
 const statusConfig = {
   submitted: { label: "Submitted", color: "bg-primary/10 text-primary" },
@@ -20,6 +22,7 @@ const statusConfig = {
 };
 
 export default function Claims() {
+  const { clinicId } = useClinic();
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [claims, setClaims] = useState([]);
@@ -31,7 +34,7 @@ export default function Claims() {
       setLoading(true);
       setError(null);
       try {
-        const res = await base44.functions.invoke("awsClaims", { action: "list" });
+        const res = await base44.functions.invoke("awsClaims", { action: "list", clinic_id: clinicId });
         const raw = res.data;
         const list = Array.isArray(raw) ? raw : (Array.isArray(raw?.claims) ? raw.claims : (Array.isArray(raw?.data) ? raw.data : (Array.isArray(raw?.items) ? raw.items : [])));
         setClaims(list);
@@ -141,7 +144,19 @@ export default function Claims() {
                     <TableCell className="text-sm text-muted-foreground">{days}d</TableCell>
                     <TableCell>
                       {claim.status === "denied" && (
-                        <Button size="sm" variant="ghost" className="text-primary text-xs gap-1 h-7">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-primary text-xs gap-1 h-7"
+                          onClick={async () => {
+                            try {
+                              await base44.functions.invoke("awsClaims", { action: "appeal", clinic_id: clinicId, claim_id: claim.id || claim.claim_number });
+                              toast.success(`Appeal submitted for claim ${claim.claim_number || claim.id}`);
+                            } catch(e) {
+                              toast.error("Appeal failed: " + (e.message || "Try again."));
+                            }
+                          }}
+                        >
                           Appeal <ArrowRight className="w-3 h-3" />
                         </Button>
                       )}

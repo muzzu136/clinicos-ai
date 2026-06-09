@@ -46,14 +46,14 @@ export default function Dashboard() {
         const collectionRate = claims.length > 0 ? Math.round((paidClaims / claims.length) * 100) : 0;
 
         setKpis([
-          { title: "Monthly Revenue", value: `$${(totalRevenue / 1000).toFixed(0)}K`, change: 12.4, changeLabel: "vs last month", icon: DollarSign, iconColor: "bg-emerald-100 text-emerald-600" },
-          { title: "Active Patients", value: activePatients.toString(), change: 8.2, changeLabel: "vs last month", icon: Users, iconColor: "bg-primary/10 text-primary" },
-          { title: "Appointments Today", value: todayAppts.toString(), change: -2.1, changeLabel: "vs avg day", icon: Calendar, iconColor: "bg-amber-100 text-amber-600" },
-          { title: "Collection Rate", value: `${collectionRate}%`, change: 3.6, changeLabel: "vs last month", icon: TrendingUp, iconColor: "bg-violet-100 text-violet-600" },
-          { title: "Claims Pending", value: pendingClaims.toString(), change: -15.3, changeLabel: "fewer than last month", icon: FileText, iconColor: "bg-sky-100 text-sky-600" },
-          { title: "Calls Handled (AI)", value: "312", change: 28.5, changeLabel: "vs last month", icon: Phone, iconColor: "bg-indigo-100 text-indigo-600" },
-          { title: "Avg Rating", value: "4.8", change: 0.3, changeLabel: "vs last quarter", icon: Star, iconColor: "bg-amber-100 text-amber-600" },
-          { title: "New Patients", value: patients.length.toString(), change: 18.7, changeLabel: "vs last month", icon: UserPlus, iconColor: "bg-emerald-100 text-emerald-600" },
+          { title: "Monthly Revenue", value: `$${(totalRevenue / 1000).toFixed(0)}K`, change: null, changeLabel: "month to date", icon: DollarSign, iconColor: "bg-emerald-100 text-emerald-600" },
+          { title: "Active Patients", value: activePatients.toString(), change: null, changeLabel: "currently active", icon: Users, iconColor: "bg-primary/10 text-primary" },
+          { title: "Appointments Today", value: todayAppts.toString(), change: null, changeLabel: "scheduled today", icon: Calendar, iconColor: "bg-amber-100 text-amber-600" },
+          { title: "Collection Rate", value: `${collectionRate}%`, change: null, changeLabel: "of claims paid", icon: TrendingUp, iconColor: "bg-violet-100 text-violet-600" },
+          { title: "Claims Pending", value: pendingClaims.toString(), change: null, changeLabel: "awaiting payment", icon: FileText, iconColor: "bg-sky-100 text-sky-600" },
+          { title: "Total Patients", value: patients.length.toString(), change: null, changeLabel: "in database", icon: Phone, iconColor: "bg-indigo-100 text-indigo-600" },
+          { title: "Denied Claims", value: claims.filter(c => c.status === "denied").length.toString(), change: null, changeLabel: "need attention", icon: Star, iconColor: "bg-amber-100 text-amber-600" },
+          { title: "New Patients", value: patients.filter(p => { const d = new Date(p.created_at || p.date_added); return !isNaN(d) && d >= new Date(Date.now() - 30*24*60*60*1000); }).length.toString(), change: null, changeLabel: "last 30 days", icon: UserPlus, iconColor: "bg-emerald-100 text-emerald-600" },
         ]);
       } catch (e) {
         console.error("Failed to load dashboard data:", e);

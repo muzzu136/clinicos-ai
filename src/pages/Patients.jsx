@@ -152,7 +152,7 @@ export default function Patients() {
                       <div className="flex items-center gap-3">
                         <Avatar className="w-8 h-8">
                           <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {name.split(" ").map(n => n[0]).join("")}
+                            {name.split(" ").filter(Boolean).map(n => n[0]).join("").slice(0,2) || "?"}
                           </AvatarFallback>
                         </Avatar>
                         <span className="font-medium">{name}</span>

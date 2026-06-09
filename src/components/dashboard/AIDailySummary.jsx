@@ -13,6 +13,7 @@ export default function AIDailySummary() {
 
   const fetchData = async () => {
     setLoading(true);
+    setAiLoading(true);
     try {
       const today = new Date().toISOString().split("T")[0];
 
@@ -58,7 +59,6 @@ export default function AIDailySummary() {
       setLastUpdated(new Date());
 
       // Generate AI narrative
-      setAiLoading(true);
       const prompt = `You are a clinic operations AI. Generate a concise daily briefing (4-5 bullet points) based on these metrics:
 - Appointments today: ${todayAppts.length} (completed: ${completed}, no-shows: ${noShows})
 - Revenue today: $${revenueToday.toLocaleString()}
@@ -67,12 +67,18 @@ export default function AIDailySummary() {
 
 Each bullet should be a specific, actionable insight. Be direct and practical. Format as plain bullet points starting with "•".`;
 
-      const aiRes = await base44.integrations.Core.InvokeLLM({ prompt });
-      setAiNarrative(typeof aiRes === "string" ? aiRes : aiRes?.text || "");
+      try {
+        const aiRes = await base44.integrations.Core.InvokeLLM({ prompt });
+        setAiNarrative(typeof aiRes === "string" ? aiRes : aiRes?.text || "");
+      } catch (aiErr) {
+        console.error("AI narrative failed:", aiErr);
+      } finally {
+        setAiLoading(false);
+      }
     } catch (e) {
       console.error(e);
+      setAiLoading(false);
     }
-    setAiLoading(false);
     setLoading(false);
   };
 

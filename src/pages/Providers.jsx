@@ -4,10 +4,11 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Star, DollarSign, Users, Calendar, TrendingUp, Clock, Plus, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import AddProviderDialog from "@/components/dialogs/AddProviderDialog";
-import { useAuth } from "@/lib/AuthContext";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
@@ -26,38 +27,34 @@ const revenueData = providers.map(p => ({
 }));
 
 export default function Providers() {
-  const [providersList, setProvidersList] = useState(providers);
+  const { clinicId } = useClinic();
+  const [providersList, setProvidersList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [clinicId, setClinicId] = useState("");
-  const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchClinic = async () => {
-      try {
-        const clinics = await base44.entities.Clinic.filter({ admin_id: user?.id });
-        if (clinics.length > 0) setClinicId(clinics[0].id);
-      } catch (e) {
-        console.error("Failed to fetch clinic:", e);
-      }
-    };
-    if (user?.id) fetchClinic();
-  }, [user?.id]);
-
-  const handleProviderAdded = async () => {
+  const fetchProviders = useCallback(async () => {
+    if (!clinicId) return;
+    setLoading(true);
     try {
-      const updatedProviders = await base44.entities.Provider.filter({ clinic_id: clinicId });
-      setProvidersList(updatedProviders.length > 0 ? updatedProviders : providers);
+      const res = await base44.entities.Provider.filter({ clinic_id: clinicId });
+      setProvidersList(res.length > 0 ? res : providers);
     } catch (e) {
       console.error("Failed to load providers:", e);
+      setProvidersList(providers); // fallback to sample data
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [clinicId]);
+
+  useEffect(() => { fetchProviders(); }, [fetchProviders]);
 
   const handleDeleteProvider = async (providerId) => {
     try {
       await base44.entities.Provider.delete(providerId);
-      setProvidersList(providersList.filter(p => p.id !== providerId));
+      setProvidersList(prev => prev.filter(p => p.id !== providerId));
+      toast.success("Provider removed.");
     } catch (e) {
-      console.error("Failed to delete provider:", e);
+      toast.error("Failed to delete: " + (e.message || "Try again."));
     }
   };
 
@@ -69,7 +66,7 @@ export default function Providers() {
           <p className="text-sm text-muted-foreground mt-0.5">AI-powered provider performance analytics</p>
         </div>
         <Button onClick={() => setShowAddDialog(true)} className="gap-2"><Plus className="w-4 h-4" />Add Provider</Button>
-        <AddProviderDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} clinicId={clinicId} onSuccess={handleProviderAdded} />
+        <AddProviderDialog open={showAddDialog} onClose={() => setShowAddDialog(false)} clinicId={clinicId} onSuccess={fetchProviders} />
       </div>
 
       {/* Provider Cards */}

@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -85,13 +88,14 @@ const opportunities = [
 const threatColor = { high: "bg-red-100 text-red-700", medium: "bg-amber-100 text-amber-700", low: "bg-emerald-100 text-emerald-700" };
 
 export default function CompetitorIntelligence() {
+  const { clinicId } = useClinic();
   const [tab, setTab] = useState("overview");
   const [loading, setLoading] = useState(false);
 
   const handleRefreshAnalysis = async () => {
     setLoading(true);
     setTimeout(() => {
-      alert("✓ Competitor analysis refreshed. Nearby competitors within 2-mile radius with similar specialties analyzed.");
+      toast.success("Competitor analysis refreshed. Nearby competitors analyzed.");
       setLoading(false);
     }, 1500);
   };

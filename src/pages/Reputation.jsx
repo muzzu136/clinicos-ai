@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Star, ThumbsUp, ThumbsDown, MessageSquare, TrendingUp, ExternalLink, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 
 const platforms = [
   { name: "Google", rating: 4.8, count: 247, trend: "+12 this month", color: "bg-primary/10 text-primary" },
@@ -29,6 +32,7 @@ const StarRating = ({ rating }) => (
 );
 
 export default function Reputation() {
+  const { clinicId } = useClinic();
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [generatedReply, setGeneratedReply] = useState("");
@@ -68,7 +72,7 @@ export default function Reputation() {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => { setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Close</Button>
-                <Button onClick={() => { alert("✓ Reply posted!"); setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Post Reply</Button>
+                <Button onClick={async () => { try { await base44.functions.invoke("awsReputation", { action: "post_reply", clinic_id: clinicId, review_id: selectedReview?.id, reply: aiReply }); toast.success("Reply posted successfully!"); } catch(e) { toast.error("Failed to post reply: " + (e.message || "Try again.")); } setShowAIGenerator(false); setSelectedReview(null); }} className="flex-1">Post Reply</Button>
               </div>
             </div>
           </div>

@@ -1,145 +1,163 @@
 import { useState } from "react";
-import { createPortal } from "react-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { base44 } from "@/api/base44Client";
-import { X, Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { useClinic } from "@/components/ClinicContext";
+
+const defaultForm = {
+  patient_name: "",
+  provider_name: "",
+  appointment_date: "",
+  duration_minutes: 30,
+  type: "follow_up",
+  status: "scheduled",
+  notes: "",
+};
 
 export default function NewAppointmentDialog({ open, onClose, onSuccess }) {
-  const [formData, setFormData] = useState({
-    patient_name: "",
-    provider_name: "",
-    appointment_date: "",
-    duration_minutes: 30,
-    type: "follow_up",
-    status: "scheduled",
-  });
+  const { clinicId } = useClinic();
+  const [formData, setFormData] = useState(defaultForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.patient_name || !formData.provider_name || !formData.appointment_date) {
-      setError("Please fill in all required fields");
+      setError("Please fill in all required fields.");
       return;
     }
-
     setLoading(true);
     setError("");
     try {
       await base44.functions.invoke("awsAppointments", {
         action: "create",
+        clinic_id: clinicId,
         appointment: formData,
       });
-      setFormData({
-        patient_name: "",
-        provider_name: "",
-        appointment_date: "",
-        duration_minutes: 30,
-        type: "follow_up",
-        status: "scheduled",
-      });
+      setFormData(defaultForm);
       onSuccess?.();
       onClose();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create appointment. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!open) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-card rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">New Appointment</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+  return (
+    <Dialog open={open} onOpenChange={(val) => { if (!val && !loading) { setError(""); onClose(); } }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>New Appointment</DialogTitle>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm font-medium">Patient Name *</label>
+            <Label htmlFor="patient_name" className="text-sm font-medium">Patient Name *</Label>
             <Input
+              id="patient_name"
+              name="patient_name"
               value={formData.patient_name}
-              onChange={(e) => setFormData({ ...formData, patient_name: e.target.value })}
+              onChange={handleChange}
               placeholder="Enter patient name"
               className="mt-1"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium">Provider Name *</label>
+            <Label htmlFor="provider_name" className="text-sm font-medium">Provider Name *</Label>
             <Input
+              id="provider_name"
+              name="provider_name"
               value={formData.provider_name}
-              onChange={(e) => setFormData({ ...formData, provider_name: e.target.value })}
+              onChange={handleChange}
               placeholder="Enter provider name"
               className="mt-1"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium">Date & Time *</label>
+            <Label htmlFor="appointment_date" className="text-sm font-medium">Date & Time *</Label>
             <Input
+              id="appointment_date"
+              name="appointment_date"
               type="datetime-local"
               value={formData.appointment_date}
-              onChange={(e) => setFormData({ ...formData, appointment_date: e.target.value })}
+              onChange={handleChange}
               className="mt-1"
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium">Duration (min)</Label>
+              <Input
+                name="duration_minutes"
+                type="number"
+                min="15"
+                step="15"
+                value={formData.duration_minutes}
+                onChange={handleChange}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Type</Label>
+              <Select value={formData.type} onValueChange={(v) => setFormData(p => ({ ...p, type: v }))}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new_patient">New Patient</SelectItem>
+                  <SelectItem value="follow_up">Follow-up</SelectItem>
+                  <SelectItem value="wellness">Wellness</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                  <SelectItem value="telehealth">Telehealth</SelectItem>
+                  <SelectItem value="procedure">Procedure</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div>
-            <label className="text-sm font-medium">Duration (minutes)</label>
+            <Label htmlFor="notes" className="text-sm font-medium">Notes</Label>
             <Input
-              type="number"
-              value={formData.duration_minutes}
-              onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Optional notes"
               className="mt-1"
             />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Type</label>
-            <select
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="w-full mt-1 rounded-md border border-input bg-transparent px-3 py-1.5 text-sm"
-            >
-              <option value="new_patient">New Patient</option>
-              <option value="follow_up">Follow-up</option>
-              <option value="wellness">Wellness</option>
-              <option value="urgent">Urgent</option>
-              <option value="telehealth">Telehealth</option>
-              <option value="procedure">Procedure</option>
-            </select>
           </div>
 
           {error && (
-            <div className="text-sm text-destructive bg-destructive/10 rounded-md p-2">
+            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-md p-3">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               {error}
             </div>
           )}
 
-          <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={onClose} className="flex-1" disabled={loading}>
+          <div className="flex gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => { setError(""); onClose(); }} className="flex-1" disabled={loading}>
               Cancel
             </Button>
-            <Button type="submit" className="flex-1" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Create
+            <Button type="submit" className="flex-1 gap-2" disabled={loading}>
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              Create Appointment
             </Button>
           </div>
         </form>
-      </motion.div>
-    </div>,
-    document.body
+      </DialogContent>
+    </Dialog>
   );
 }
