@@ -58,7 +58,6 @@ const plans = [
       "Up to 8 Providers",
       "Everything in Growth",
       "Financial Intelligence & Forecasting",
-      "Billing Automation",
       "Real-Time Eligibility Checks",
       "Staff & Operational Analytics",
       "Phone & Chat Support",
@@ -104,14 +103,7 @@ const addons = [
     tagColor: "bg-emerald-100 text-emerald-700",
     example: "Example: $20K recovered → +$1,000–$2,000/mo"
   },
-  {
-    name: "Billing Automation",
-    priceRange: "$299–$999/mo",
-    icon: Zap,
-    color: "bg-primary/10 text-primary",
-    desc: "AI coding, prior auth automation, underpayment detection, text-to-pay.",
-    tag: null
-  },
+
   {
     name: "Multi-Location",
     priceRange: "$499+/mo per location",
