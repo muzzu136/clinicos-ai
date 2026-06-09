@@ -74,7 +74,14 @@ export default function NewAppointmentDialog({ open, onClose, onSuccess }) {
       onSuccess?.(created);
       onClose();
     } catch (err) {
-      setError(err.message || "Failed to create appointment. Please try again.");
+      console.error("awsAppointments create error:", err);
+      if (err?.status === 502 || String(err?.message).includes("502")) {
+        setError("Server error: The appointment Lambda (awsAppointments) returned a 502. Check that the 'create' action is implemented in your AWS function.");
+      } else if (err?.status === 403) {
+        setError("Permission denied. Check your Lambda permissions and clinic ID.");
+      } else {
+        setError(err.message || "Failed to create appointment. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
