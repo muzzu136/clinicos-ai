@@ -10,14 +10,21 @@ import {
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 
-export default function TopBar() {
+export default function TopBar({ onMenuClick }) {
   const { user } = useAuth();
   const initials = user?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase() || "U";
 
   return (
-    <header className="h-16 border-b border-border bg-card/80 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-40">
-      <div className="flex items-center gap-4 flex-1">
-        <div className="relative max-w-md w-full">
+    <header className="h-16 border-b border-border bg-card/80 backdrop-blur-xl flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40">
+      <div className="flex items-center gap-3 flex-1">
+        {/* Mobile menu button */}
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="relative max-w-md w-full hidden sm:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search patients, claims, appointments..."

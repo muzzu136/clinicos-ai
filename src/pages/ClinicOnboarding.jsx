@@ -33,10 +33,10 @@ export default function ClinicOnboarding() {
 
       // Update user with clinic_id
       await base44.auth.updateMe({ clinic_id: clinic.id });
-      window.location.href = "/customer/dashboard";
+      window.location.href = "/dashboard";
     } catch (e) {
       console.error("Onboarding error:", e);
-      toast.error("Onboarding error:");
+      toast.error(e?.message || "Onboarding failed. Please try again.");
     } finally {
       setLoading(false);
     }

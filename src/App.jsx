@@ -41,6 +41,8 @@ import CustomerDashboard from '@/pages/CustomerDashboard';
 import CustomerPatients from '@/pages/CustomerPatients';
 import SubscriptionPlans from '@/pages/SubscriptionPlans';
 import ClinicOnboarding from '@/pages/ClinicOnboarding';
+import LandingPage from '@/pages/LandingPage';
+import PublicHomePage from '@/components/PublicHomePage';
 import AdminClinicManagement from '@/pages/AdminClinicManagement';
 import ClaimIntelligence from '@/pages/ClaimIntelligence';
 import { ClinicProvider } from '@/components/ClinicContext';
@@ -62,23 +64,25 @@ const AuthenticatedApp = () => {
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
     }
+    // Don't auto-redirect for auth_required — let public routes render
+    // Protected routes handle their own redirects via ProtectedRoute
   }
 
   return (
     <Routes>
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<ClinicOnboarding />} />
+      <Route path="/pricing" element={<LandingPage />} />
+      <Route path="/" element={<PublicHomePage />} />
 
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<ClinicProvider><AppLayout /></ClinicProvider>}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/customer/dashboard" element={<CustomerDashboard />} />
           <Route path="/customer/patients" element={<CustomerPatients />} />
           <Route path="/patients" element={<Patients />} />
