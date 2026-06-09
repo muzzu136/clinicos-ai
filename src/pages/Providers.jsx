@@ -31,6 +31,7 @@ export default function Providers() {
   const [providersList, setProvidersList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingProvider, setEditingProvider] = useState(null);
 
   const fetchProviders = useCallback(async () => {
     if (!clinicId) return;
@@ -128,7 +129,7 @@ export default function Providers() {
                 </Badge>
               </div>
               <div className="flex gap-2 pt-2 border-t border-border">
-                <Button variant="ghost" size="sm" className="flex-1 text-xs">Edit</Button>
+                <Button variant="ghost" size="sm" className="flex-1 text-xs" onClick={() => setEditingProvider(provider)}>Edit</Button>
                 <Button variant="ghost" size="sm" className="text-xs text-destructive" onClick={() => handleDeleteProvider(provider.id)}><Trash2 className="w-3 h-3" /></Button>
               </div>
             </div>

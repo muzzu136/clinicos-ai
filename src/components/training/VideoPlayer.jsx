@@ -75,6 +75,7 @@ export default function VideoPlayer({ open, lessonTitle, onClose, onComplete }) 
             title={lessonTitle}
             controls
             autoPlay
+            onEnded={handleComplete}
             className="w-full h-full"
           />
         </div>
@@ -82,7 +83,7 @@ export default function VideoPlayer({ open, lessonTitle, onClose, onComplete }) 
         {/* Footer */}
         {!isFullscreen && (
           <div className="p-4 border-t border-border flex items-center justify-between bg-muted/30">
-            <p className="text-sm text-muted-foreground">Finish watching to mark as complete</p>
+            <p className="text-sm text-muted-foreground">Video will auto-complete when finished, or click below</p>
             <Button onClick={handleComplete} className="gap-2">
               Mark as Complete
             </Button>

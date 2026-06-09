@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,16 +33,40 @@ const initialItems = [
 ];
 
 export default function RecoveryWorklist() {
+  const { clinicId } = useClinic();
   const [items, setItems] = useState(initialItems);
   const [filter, setFilter] = useState("all");
 
-  const advance = (id) => {
-    setItems(prev => prev.map(item => {
-      if (item.id !== id) return item;
-      const idx = PIPELINE.indexOf(item.status);
-      const next = PIPELINE[idx + 1];
-      return { ...item, status: next || item.status };
-    }));
+  // Load real worklist from DB
+  useEffect(() => {
+    if (!clinicId) return;
+    const load = async () => {
+      try {
+        const res = await base44.functions.invoke("awsClaims", { action: "recovery_worklist", clinic_id: clinicId });
+        const list = res?.data;
+        if (Array.isArray(list) && list.length > 0) setItems(list);
+      } catch { /* fallback to sample */ }
+    };
+    load();
+  }, [clinicId]);
+
+  const advance = async (id) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const idx = PIPELINE.indexOf(item.status);
+    const next = PIPELINE[Math.min(idx + 1, PIPELINE.length - 1)];
+    setItems(prev => prev.map(i => i.id === id ? { ...i, status: next } : i));
+    try {
+      await base44.functions.invoke("awsClaims", {
+        action: "update_recovery_status",
+        clinic_id: clinicId,
+        claim_id: item.claim,
+        status: next,
+      });
+      toast.success(`${item.claim} moved to "${pipelineConfig[next].label}"`);
+    } catch (e) {
+      toast.error("Failed to update status: " + (e.message || "Try again."));
+    }
   };
 
   const displayed = filter === "all" ? items : items.filter(i => i.status === filter);

@@ -28,6 +28,7 @@ export default function AddLeadDialog({ open, onClose, clinicId, onSuccess }) {
       onClose();
     } catch (e) {
       console.error("Failed to create lead:", e);
+      toast.error(e.message || "Failed to add lead. Please try again.");
     }
     setLoading(false);
   };

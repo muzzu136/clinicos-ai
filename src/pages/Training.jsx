@@ -139,11 +139,16 @@ export default function Training() {
         await base44.entities.TrainingProgress.create({
           module_category: moduleCategory,
           lesson_title: lessonTitle,
-          completed
+          completed,
+          completed_at: completed ? new Date().toISOString() : null,
         });
+      }
+      if (completed) {
+        import("sonner").then(({ toast }) => toast.success(`"${lessonTitle}" marked complete!`));
       }
     } catch (e) {
       console.error("Failed to save progress:", e);
+      import("sonner").then(({ toast }) => toast.error("Could not save progress. Please try again."));
     }
   };
 
@@ -262,7 +267,7 @@ export default function Training() {
                         variant={lesson.completed ? "ghost" : "outline"}
                         className="shrink-0 text-xs h-7"
                         onClick={() => {
-                          if (lesson.type === "video") {
+                          if (lesson.type === "video" && !lesson.completed) {
                             setVideoModal({ open: true, lesson: lesson.title, module: mod.category });
                           } else {
                             const newCompleted = !lesson.completed;

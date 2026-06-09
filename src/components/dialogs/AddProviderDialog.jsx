@@ -29,6 +29,7 @@ export default function AddProviderDialog({ open, onClose, clinicId, onSuccess }
       onClose();
     } catch (e) {
       console.error("Failed to create provider:", e);
+      toast.error(e.message || "Failed to add provider. Please try again.");
     }
     setLoading(false);
   };

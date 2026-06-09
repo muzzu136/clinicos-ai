@@ -22,7 +22,7 @@ const statusConfig = {
 };
 
 export default function Claims() {
-  const { clinicId } = useClinic();
+  const { clinicId, loading: clinicLoading } = useClinic();
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [claims, setClaims] = useState([]);
@@ -31,6 +31,7 @@ export default function Claims() {
 
   useEffect(() => {
     const fetchClaims = async () => {
+      if (!clinicId) { setLoading(false); return; }
       setLoading(true);
       setError(null);
       try {

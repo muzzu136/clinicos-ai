@@ -60,10 +60,7 @@ export default function Settings() {
   const [tab, setTab] = useState("clinic");
   const [notifState, setNotifState] = useState(defaultNotifications);
   const [showConnectDialog, setShowConnectDialog] = useState(null);
-  const [connectedIntegrations, setConnectedIntegrations] = useState({
-    "Tebra (Kareo)": true, "Twilio SMS": true, "RingCentral": true,
-    "Stripe": true, "Availity": true, "Google Calendar": true,
-  });
+  const [connectedIntegrations, setConnectedIntegrations] = useState({});
 
   // Clinic profile form state
   const [profile, setProfile] = useState({
@@ -74,7 +71,7 @@ export default function Settings() {
   const [profileSaving, setProfileSaving] = useState(false);
   const [hoursSaving, setHoursSaving] = useState(false);
 
-  // Pre-populate form from clinic data
+  // Pre-populate form from clinic data (including real integration state)
   useEffect(() => {
     if (!clinic) return;
     setProfile({
@@ -93,6 +90,10 @@ export default function Settings() {
         ...n,
         enabled: clinic.notification_prefs[n.label] ?? n.enabled,
       })));
+    }
+    // Load real integration connection state from DB
+    if (clinic.integrations) {
+      setConnectedIntegrations(clinic.integrations);
     }
   }, [clinic]);
 

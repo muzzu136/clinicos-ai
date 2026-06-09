@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,9 +26,41 @@ const mockDenials = [
 ];
 
 export default function DenialAnalyzerTool() {
+  const { clinicId } = useClinic();
   const [expanded, setExpanded] = useState(null);
+  const [denials, setDenials] = useState(mockDenials);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef(null);
 
-  const totalAtRisk = mockDenials.reduce((s, d) => s + d.amount, 0);
+  const handleImport = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    toast.info(`Importing ${file.name}...`);
+    try {
+      const text = await file.text();
+      const res = await base44.functions.invoke("awsClaims", {
+        action: "import_era",
+        clinic_id: clinicId,
+        filename: file.name,
+        content: text.slice(0, 50000),
+      });
+      const imported = res?.data?.denials || res?.data;
+      if (Array.isArray(imported) && imported.length > 0) {
+        setDenials(imported);
+        toast.success(`Imported ${imported.length} denial record(s).`);
+      } else {
+        toast.success("File imported successfully.");
+      }
+    } catch (e) {
+      toast.error("Import failed: " + (e.message || "Check file format."));
+    } finally {
+      setImporting(false);
+      e.target.value = "";
+    }
+  };
+
+  const totalAtRisk = denials.reduce((s, d) => s + d.amount, 0);
 
   return (
     <div className="space-y-4">
@@ -33,8 +69,10 @@ export default function DenialAnalyzerTool() {
           <h3 className="font-heading font-semibold">Denial Analyzer</h3>
           <p className="text-xs text-muted-foreground mt-0.5">AI-categorized denials with plain-English explanations and next actions</p>
         </div>
-        <Button variant="outline" className="gap-2 text-sm">
-          <Upload className="w-4 h-4" /> Import ERA / CSV
+        <input ref={fileInputRef} type="file" accept=".csv,.era,.txt,.835" className="hidden" onChange={handleImport} />
+        <Button variant="outline" className="gap-2 text-sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
+          {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          {importing ? "Importing..." : "Import ERA / CSV"}
         </Button>
       </div>
 
@@ -52,7 +90,7 @@ export default function DenialAnalyzerTool() {
       </div>
 
       <div className="space-y-2">
-        {mockDenials.map((denial) => {
+        {denials.map((denial) => {
           const info = DENIAL_CODES[denial.code] || { category: "Other", color: "bg-muted text-muted-foreground border-border", plain: "Review claim details." };
           const isOpen = expanded === denial.id;
           return (

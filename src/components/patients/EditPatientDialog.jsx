@@ -35,6 +35,7 @@ export default function EditPatientDialog({ open, onOpenChange, patient, clinicI
       onPatientUpdated?.();
     } catch (error) {
       console.error("Error updating patient:", error);
+      toast.error(error.message || "Failed to update patient.");
     }
     setLoading(false);
   };
@@ -52,6 +53,7 @@ export default function EditPatientDialog({ open, onOpenChange, patient, clinicI
       onPatientUpdated?.();
     } catch (error) {
       console.error("Error deleting patient:", error);
+      toast.error(error.message || "Failed to delete patient.");
     }
     setDeleting(false);
   };

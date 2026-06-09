@@ -1,4 +1,8 @@
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useClinic } from "@/components/ClinicContext";
+import { toast } from "sonner";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,6 +47,18 @@ const statusConfig = {
 };
 
 export default function DenialDashboard() {
+  const { clinicId } = useClinic();
+  const [prioritizing, setPrioritizing] = useState(false);
+
+  const handlePrioritize = async () => {
+    setPrioritizing(true);
+    try {
+      await base44.functions.invoke("awsClaims", { action: "ai_prioritize_denials", clinic_id: clinicId });
+      toast.success("AI has reprioritized your denial queue.");
+    } catch (e) {
+      toast.error("Prioritization failed: " + (e.message || "Try again."));
+    } finally { setPrioritizing(false); }
+  };
   return (
     <div className="space-y-6">
       {/* KPI Row */}
@@ -119,8 +135,9 @@ export default function DenialDashboard() {
             <h3 className="font-heading font-semibold text-sm">Recent Denial Records</h3>
             <p className="text-xs text-muted-foreground">AI-analyzed with recommended actions</p>
           </div>
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-            <Zap className="w-3 h-3" /> AI Prioritize All
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={handlePrioritize} disabled={prioritizing}>
+            {prioritizing ? <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline-block" /> : <Zap className="w-3 h-3" />}
+            {prioritizing ? "Prioritizing..." : "AI Prioritize All"}
           </Button>
         </div>
         <div className="overflow-x-auto">

@@ -22,7 +22,7 @@ const statusColors = {
 };
 
 export default function Appointments() {
-  const { clinicId } = useClinic();
+  const { clinicId, loading: clinicLoading } = useClinic();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,8 +43,11 @@ export default function Appointments() {
   }, [clinicId]);
 
   useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
+    if (!clinicLoading) {
+      if (clinicId) fetchAppointments();
+      else setLoading(false);
+    }
+  }, [clinicId, clinicLoading, fetchAppointments]);
 
   const today = appointments.filter(a => {
     if (!a.appointment_date) return false;

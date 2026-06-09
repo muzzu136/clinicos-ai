@@ -22,7 +22,7 @@ const statusConfig = {
 };
 
 export default function Patients() {
-  const { clinicId } = useClinic();
+  const { clinicId, loading: clinicLoading } = useClinic();
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
   const [patients, setPatients] = useState([]);
@@ -33,13 +33,12 @@ export default function Patients() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchPatients = async () => {
+    setLoading(true);
+    setError(null);
     if (!clinicId) {
-      setError("No clinic ID available");
       setLoading(false);
       return;
     }
-    setLoading(true);
-    setError(null);
     try {
       const res = await base44.functions.invoke("awsPatients", { action: "list", clinic_id: clinicId });
       const raw = res.data;
@@ -52,10 +51,15 @@ export default function Patients() {
   };
 
   useEffect(() => {
-    if (clinicId) {
-      fetchPatients();
+    // When ClinicContext finishes loading (even without clinicId), stop the spinner
+    if (!clinicLoading) {
+      if (clinicId) {
+        fetchPatients();
+      } else {
+        setLoading(false);
+      }
     }
-  }, [clinicId]);
+  }, [clinicId, clinicLoading]);
 
   const filtered = patients.filter(p => {
     const name = p.name || `${p.first_name || ""} ${p.last_name || ""}`.trim();
